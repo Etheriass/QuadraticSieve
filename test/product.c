@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include "product.h"
-#include "../Tools/tools.h"
+#include "../src/Product/product.h"
+#include "../src/Tools/tools.h"
 
 int main()
 {

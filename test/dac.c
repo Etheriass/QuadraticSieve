@@ -3,15 +3,15 @@
 #include <time.h>
 #include <omp.h>
 #include <cblas.h>
-#include "../Tools/tools.h"
-#include "../Tools/dac_tools.h"
-#include "../DAC/dac_multiplication.h"
-#include "../DAC/dac_multiplication_parra.h"
-#include "../DAC/dac_multiplication_strassen.h"
-#include "../DAC/dac_multiplication_strassen_parra.h"
-#include "../DAC/dac_multiplication_strassen_combined.h"
-#include "../DAC/dac_multiplication_alpha.h"
-#include "../Product/product.h"
+#include "../src/Tools/tools.h"
+#include "../src/Tools/dac_tools.h"
+#include "../src/DAC/dac_multiplication.h"
+#include "../src/DAC/dac_multiplication_parra.h"
+#include "../src/DAC/dac_multiplication_strassen.h"
+#include "../src/DAC/dac_multiplication_strassen_parra.h"
+#include "../src/DAC/dac_multiplication_strassen_combined.h"
+#include "../src/DAC/dac_multiplication_alpha.h"
+#include "../src/Product/product.h"
 
 int main()
 {

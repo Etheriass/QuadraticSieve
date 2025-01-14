@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "../Tools/Tools.h"
-#include "Gauss.h"
+#include "../src/Tools/tools.h"
+#include "../src/Gauss/gauss.h"
 
 int main()
 {

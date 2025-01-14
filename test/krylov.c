@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "../Tools/tools.h"
-#include "krylov.h"
+#include "../src/Tools/tools.h"
+#include "../src/Krylov/krylov.h"
 
 int main(){
     int n = 3;

@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <omp.h>
-#include "eratosthene.h"
+#include "../src/Eratosthene/eratosthene.h"
 
 int main() {
     

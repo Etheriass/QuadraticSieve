@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "Factorization.h"
-#include "../Eratosthene/Eratosthene.h"
+#include "../src/Factorization/factorization.h"
+#include "../src/Eratosthene/eratosthene.h"
 
 int main()
 {

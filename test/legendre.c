@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "Legendre.h"
+#include "../src/Legendre/legendre.h"
 
 int main()
 {

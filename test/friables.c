@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
-#include "friables.h"
+#include "../src/Friables/friables.h"
 
 int testBfriables(int X, int B)
 {
