@@ -21,6 +21,8 @@
         "numbers": "c",
         "dac_multiplication_alpha.h": "c",
         "dac_multiplication_strassen_combined.h": "c",
-        "cblas.h": "c"
+        "cblas.h": "c",
+        "math.h": "c",
+        "friables.h": "c"
     }
 }
