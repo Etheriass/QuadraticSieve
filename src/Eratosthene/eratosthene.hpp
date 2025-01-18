@@ -1,6 +1,6 @@
 #ifndef ERATOSTHENE_H
 #define ERATOSTHENE_H
-
+#include <vector>
 
 /*
  * Eratosthene Sieve
@@ -10,7 +10,9 @@
  *
  * returns: An array of the primes less or equal to n
  */
-int* eratostheneSieve(int n, int* resultSize);
+std::vector<int> eratostheneSieve(int n);
+// int* eratostheneSieve(int n, int* resultSize);
+
 // unsigned long long* eratostheneSieveLong(int n, int* resultSize);
 
 #endif
