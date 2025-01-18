@@ -1,31 +1,34 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
 #include <math.h>
-#include <time.h>
+#include <chrono>
+#include <vector>
 #include "Eratosthene/eratosthene.hpp"
-#include "Friables/friables.h"
-#include "Tools/tools.h"
-#include "Factorization/factorization.h"
-#include "Krylov/krylov.h"
+// #include "Friables/friables.h"
+// #include "Tools/tools.h"
+// #include "Factorization/factorization.h"
+// #include "Krylov/krylov.h"
 
 int main() {
+    auto start = std::chrono::high_resolution_clock::now();
+    
     unsigned long long N = 184467440737095601;//17595551;18446744073709551615
+    printf("===============\n");
+    printf("Quadratic Sieve\n");
+    printf("===============\n");
     printf("Factorisation of %llu: \n", N);
 
-    clock_t start, end;
-    start = clock();
-
     // Collection phase
-    int B = (int)exp(0.5*sqrt(log(N) * log(log(N))))+120;
+    int B = (int)exp(0.5*sqrt(log(N) * log(log(N))));
     printf("Choosen B: %d\n", B);
 
-    int piB;
-    int* primes = eratostheneSieve(B, &piB);
-    if (primes == NULL){
-        fprintf(stderr, "Memory allocation failed\n");
-        exit(EXIT_FAILURE);
-    }
-    
+    std::vector<int> primes = eratostheneSieve(B);
+    int piB = primes.size();
+    auto top = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = top - start;
+    std::cout << " - Eratosthene sieve took:" << elapsed.count() << " s\n";
+
     int A = 102000;
 
     printf("Number of square to find: %d\n", piB);
