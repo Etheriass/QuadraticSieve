@@ -13,6 +13,7 @@
 std::vector<int> eratostheneSieve(int n);
 // int* eratostheneSieve(int n, int* resultSize);
 
+std::vector<unsigned long long> eratostheneSieveLong(int n);
 // unsigned long long* eratostheneSieveLong(int n, int* resultSize);
 
 #endif

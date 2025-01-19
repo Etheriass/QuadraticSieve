@@ -32,6 +32,35 @@ std::vector<int> eratostheneSieve(int n) {
 }
 
 
+std::vector<unsigned long long> eratostheneSieveLong(int n) {
+    if (n < 2) {
+        return {};
+    }
+
+    // Create a boolean array to mark prime numbers
+    std::vector<bool> isPrime(n + 1, true);
+    isPrime[0] = isPrime[1] = false; // 0 and 1 are not primes
+
+    for (int i = 2; i * i <= n; ++i) {
+        if (isPrime[i]) {
+            for (int j = i * i; j <= n; j += i) {
+                isPrime[j] = false;
+            }
+        }
+    }
+
+    // Collect all primes into a vector
+    std::vector<unsigned long long> primes;
+    for (int i = 2; i <= n; ++i) {
+        if (isPrime[i]) {
+            primes.push_back(i);
+        }
+    }
+
+    return primes;
+}
+
+
 // int *eratostheneSieve(int n, int *resultSize)
 // {
 //     int *entiers = (int *)malloc(n * sizeof(int));
