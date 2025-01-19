@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "factorization.h"
+#include <vector>
+#include "factorization.hpp"
 
 int *factorization(unsigned long long a, unsigned long long *primes, int sizePrimes)
 {
@@ -24,7 +25,7 @@ int *factorization(unsigned long long a, unsigned long long *primes, int sizePri
     return factors;
 }
 
-int *factorizationMod2(unsigned long long a, int *primes, int sizePrimes)
+int *factorizationMod2(unsigned long long a, std::vector<int> primes, int sizePrimes)
 {
     int *factors = (int *)calloc(sizePrimes, sizeof(int));
     if (factors == NULL)
