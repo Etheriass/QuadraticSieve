@@ -5,7 +5,7 @@
 #include <chrono>
 #include <vector>
 #include "Eratosthene/eratosthene.hpp"
-// #include "Friables/friables.h"
+#include "Friables/friables.hpp"
 // #include "Tools/tools.h"
 // #include "Factorization/factorization.h"
 // #include "Krylov/krylov.h"
@@ -25,18 +25,21 @@ int main() {
 
     std::vector<int> primes = eratostheneSieve(B);
     int piB = primes.size();
-    auto top = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed = top - start;
+    auto eratosthene_time = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = eratosthene_time - start;
     std::cout << " - Eratosthene sieve took:" << elapsed.count() << " s\n";
 
-    int A = 102000;
+    int A = 10200000;
 
     printf("Number of square to find: %d\n", piB);
     printf("Sieving interval: [%d, %d]\n", (int)sqrt(N) + 1, (int)sqrt(N) + A);
     
-    // int nbQf;
-    // unsigned long long *Qf = QBfriablesV2Long(B, N, A, &nbQf);
-    // printf("Number of Q-B-Friable numbers in [%d, %d]: %d\n", (int)sqrt(N) + 1, (int)sqrt(N) + A, nbQf);
+    int nbQf;
+    unsigned long long *Qf = QBfriablesV2Long(B, N, A, &nbQf);
+    auto QBfriable_time = std::chrono::high_resolution_clock::now();
+    elapsed = QBfriable_time - eratosthene_time;
+    std::cout << " - QBfriable took:" << elapsed.count() << " s\n";
+    printf("Number of Q-B-Friable numbers in [%d, %d]: %d\n", (int)sqrt(N) + 1, (int)sqrt(N) + A, nbQf);
 
     // int **M = (int**)malloc(nbQf * sizeof(int*));
     // for (int i = 0; i < nbQf; i++)
@@ -57,9 +60,9 @@ int main() {
     // }
     // // printMatrix(M, nbQf, piB);
 
-    // end = clock();
-    // double cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-    // printf("Time taken for the collection phase: %f seconds\n", cpu_time_used);
+    auto processing_time = std::chrono::high_resolution_clock::now();
+    elapsed = processing_time - start;
+    printf("Time taken for the collection phase: %f seconds\n", elapsed.count());
 
     // // Processing phase
     // start = clock();
