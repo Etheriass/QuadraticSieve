@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "legendre.h"
+#include "legendre.hpp"
 
 /*
  * Legendre symbol
