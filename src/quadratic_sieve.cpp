@@ -6,8 +6,8 @@
 #include <vector>
 #include "Eratosthene/eratosthene.hpp"
 #include "Friables/friables.hpp"
-// #include "Tools/tools.h"
-// #include "Factorization/factorization.h"
+#include "Tools/tools.hpp"
+#include "Factorization/factorization.hpp"
 // #include "Krylov/krylov.h"
 
 int main() {
@@ -41,24 +41,24 @@ int main() {
     std::cout << " - QBfriable took:" << elapsed.count() << " s\n";
     printf("Number of Q-B-Friable numbers in [%d, %d]: %d\n", (int)sqrt(N) + 1, (int)sqrt(N) + A, nbQf);
 
-    // int **M = (int**)malloc(nbQf * sizeof(int*));
-    // for (int i = 0; i < nbQf; i++)
-    // {
-    //     M[i] = (int*)malloc((piB) * sizeof(int));
-    // }
+    int **M = (int**)malloc(nbQf * sizeof(int*));
+    for (int i = 0; i < nbQf; i++)
+    {
+        M[i] = (int*)malloc((piB) * sizeof(int));
+    }
 
-    // for (int i = 0; i < nbQf; i++)
-    // {
-    //     int *factors = factorizationMod2(Qf[i], primes, piB);
-    //     for (int j = 0; j < piB; j++)
-    //     {
-    //         M[i][j] = factors[j];
-    //     }
-    //     if (i == nbQf - 1){
-    //         free(factors);
-    //     }
-    // }
-    // // printMatrix(M, nbQf, piB);
+    for (int i = 0; i < nbQf; i++)
+    {
+        int *factors = factorizationMod2(Qf[i], primes, piB);
+        for (int j = 0; j < piB; j++)
+        {
+            M[i][j] = factors[j];
+        }
+        if (i == nbQf - 1){
+            free(factors);
+        }
+    }
+    // printMatrix(M, nbQf, piB);
 
     auto processing_time = std::chrono::high_resolution_clock::now();
     elapsed = processing_time - start;

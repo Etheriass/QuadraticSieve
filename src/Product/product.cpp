@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
-#include "product.h"
+#include <vector>
+#include "product.hpp"
 
 int** mat_product(int** A, int* shape_A, int** B, int* shape_B){
     // Check size of matrix
@@ -60,6 +61,92 @@ int** square_mat_product(int** A, int** B, int n){
     return M;
 }
 
+int* square_mat_product_flat(int* A, int* B, int n){
+
+    // Allocate result matrix
+    int* M = (int*)malloc(n * n * sizeof(int));
+
+    if (M == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Product
+    int res = 0;
+    for (int i = 0; i < n; i++){
+        for (int j = 0; j < n; j++){
+            res = 0;
+            for (int k = 0; k < n; k++){
+                res += A[i*n + k] * B[k*n +j];
+            }
+            M[i*n + j] = res;
+        }
+    }
+    return M;
+}
+
+int* square_mat_product_flat_parra(int* A, int* B, int n){
+
+    // Allocate result matrix
+    int* M = (int*)malloc(n * n * sizeof(int));
+
+    if (M == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Product
+    int res = 0;
+    #pragma omp simd
+    for (int i = 0; i < n; i++){
+        for (int j = 0; j < n; j++){
+            res = 0;
+            for (int k = 0; k < n; k++){
+                res += A[i*n + k] * B[k*n +j];
+            }
+            M[i*n + j] = res;
+        }
+    }
+    return M;
+}
+
+std::vector<int> square_mat_product_cpp(std::vector<int> A, std::vector<int> B, int n){
+
+    std::vector<int> M(n * n, 0); //Should be faster withou init to 0 but somehow it look faster with it (maybe compiler optimizations)
+
+    // Product
+    int res = 0;
+    for (int i = 0; i < n; i++){
+        for (int j = 0; j < n; j++){
+            res = 0;
+            for (int k = 0; k < n; k++){
+                res += A[i*n + k] * B[k*n + j];
+            }
+            M[i*n + j] = res;
+        }
+    }
+    return M;
+}
+
+std::vector<int> square_mat_product_cpp_parra(std::vector<int> A, std::vector<int> B, int n){
+
+    std::vector<int> M(n * n, 0); //Should be faster withou init to 0 but somehow it look faster with it (maybe compiler optimizations)
+    // omp_set_num_threads(10);
+    // Product
+    int res = 0;
+    #pragma omp simd
+    for (int i = 0; i < n; i++){
+        for (int j = 0; j < n; j++){
+            res = 0;
+            for (int k = 0; k < n; k++){
+                res += A[i*n + k] * B[k*n + j];
+            }
+            M[i*n + j] = res;
+        }
+    }
+    return M;
+}
+
 int** square_mat_product_parra(int** A, int** B, int n){
 
     // Allocate result matrix
@@ -75,7 +162,8 @@ int** square_mat_product_parra(int** A, int** B, int n){
     // Product
     int res = 0;
     int i, j;
-    #pragma omp parallel for private(i,j, res) shared(A, B, M, n)
+    // #pragma omp parallel for private(i,j, res) shared(A, B, M, n)
+    #pragma omp simd
     for (i = 0; i < n; i++){
         for (j = 0; j < n; j++){
             res = 0;

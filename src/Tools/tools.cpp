@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "tools.hpp"
 
 /*
  * Transpose a matrix
@@ -34,7 +35,7 @@ void printMatrix(int **A, int n, int m)
         {
             printf("%d", A[i][j]);
             if (j < m - 1)
-                printf(", ");
+                printf(" ");
         }
         printf("]\n");
     }
@@ -117,10 +118,10 @@ int **allocate_matrix(int rows, int cols)
  */
 int **allocate_square_matrix(int n)
 {
-    int **M = malloc(n * sizeof(int *));
+    int **M = (int **)malloc(n * sizeof(int *));
     for (int i = 0; i < n; i++)
     {
-        M[i] = malloc(n * sizeof(int));
+        M[i] = (int *)malloc(n * sizeof(int));
     }
     return M;
 }
