@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <cblas.h>
+// #include <cblas.h>
+#include <mkl.h>
 #include <omp.h>
 #include "../Tools/dac_tools.h"
 #include "../Tools/tools.h"
@@ -38,7 +39,8 @@ int **dac_square_mat_product_strassen_combined(int **A, int **B, int n, int deal
                 B_double[i+j*n] = (double)B[i][j];
             }
         }   
-        openblas_set_num_threads(omp_get_max_threads());
+        // openblas_set_num_threads(omp_get_max_threads());
+        mkl_set_num_threads(omp_get_max_threads());
 
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n, n, n, 1.0, A_double, n, B_double, n, 0.0, C_double, n);
         int **C = allocate_square_matrix(n);

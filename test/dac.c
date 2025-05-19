@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include <omp.h>
-#include <cblas.h>
+// #include <cblas.h>
+// #include <mkl_cblas.h>
+#include <mkl.h>
 #include "../src/Tools/tools.h"
 #include "../src/Tools/dac_tools.h"
 #include "../src/DAC/dac_multiplication.h"
@@ -15,7 +17,7 @@
 
 int main()
 {
-    int n = 4096;
+    int n = 8192;
     int print = 0;
     int **A = allocate_square_matrix(n);
     int **B = allocate_square_matrix(n);
@@ -47,7 +49,9 @@ int main()
     double end_time;
     double elapsed_time;
 
-    // printf("Nombre de thread : %d", omp_get_max_threads());
+    printf("Nombre de thread : %d\n", omp_get_max_threads());
+    omp_set_num_threads(omp_get_max_threads());
+    mkl_set_num_threads(omp_get_max_threads());
 
     // start_time = omp_get_wtime();
     // int **C = dac_square_mat_product(A, B, n);
@@ -58,14 +62,14 @@ int main()
     // elapsed_time = end_time - start_time; 
     // printf("DAC multiplication:                  %f seconds\n", elapsed_time);
 
-    start_time = omp_get_wtime();
-    int **CP = dac_square_mat_product_parra(A, B, n, 0);
-    if (print)
-        print_square_matrix(CP, n);
-    end_time = omp_get_wtime();
-    free_matrix(CP, n);
-    elapsed_time = end_time - start_time;
-    printf("DAC multiplication parra:            %f seconds\n", elapsed_time);// using %d threads\n", elapsed_time_parra, omp_get_num_procs());
+    // start_time = omp_get_wtime();
+    // int **CP = dac_square_mat_product_parra(A, B, n, 0);
+    // if (print)
+    //     print_square_matrix(CP, n);
+    // end_time = omp_get_wtime();
+    // free_matrix(CP, n);
+    // elapsed_time = end_time - start_time;
+    // printf("DAC multiplication parra:            %f seconds\n", elapsed_time);// using %d threads\n", elapsed_time_parra, omp_get_num_procs());
 
     // start_time = omp_get_wtime();
     // int **S = dac_square_mat_product_strassen(A, B, n, 0);
@@ -86,7 +90,7 @@ int main()
     // printf("DAC multiplication Strassen parra:   %f seconds\n", elapsed_time);
 
     start_time = omp_get_wtime();
-    int **SC = dac_square_mat_product_strassen_combined(A, B, n, 0, 512);
+    int **SC = dac_square_mat_product_strassen_combined(A, B, n, 0, n/4);
     if (print)
         print_square_matrix(SC, n);
     end_time = omp_get_wtime();
@@ -108,12 +112,12 @@ int main()
     // if (print)
     //     print_square_matrix(DP, n);
     // end_time = omp_get_wtime();
-    // // free_matrix(DP, n);
+    // free_matrix(DP, n);
     // elapsed_time = end_time - start_time;
     // printf("Standard multiplication parra:       %f seconds\n", elapsed_time);
 
     start_time = omp_get_wtime();
-    int **AT = dac_square_mat_product_alpha(A, B, n, 0, 512);
+    int **AT = dac_square_mat_product_alpha(A, B, n, 0, n/4);
     if (print)
         print_square_matrix(AT, n);
     end_time = omp_get_wtime();
@@ -121,12 +125,13 @@ int main()
     elapsed_time = end_time - start_time;
     printf("DAC multiplication Alpha:            %f seconds\n", elapsed_time);
 
-    openblas_set_num_threads(omp_get_max_threads());
+    // openblas_set_num_threads(omp_get_max_threads());
+    mkl_set_num_threads(omp_get_max_threads());
     start_time = omp_get_wtime();
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
                 n, n, n, 1.0, A_double, n, B_double, n, 0.0, C_double, n);
-    if (print)
-        print_square_matrix(C_double, n);
+    // if (print)
+    //     print_square_matrix(C_double, n);
     end_time = omp_get_wtime();
     // free_matrix(C_double, n);
     elapsed_time = end_time - start_time;
@@ -151,3 +156,6 @@ int main()
 
     return 0;
 }
+
+
+// gcc -I${MKLROOT}/include -L${MKLROOT}/lib/intel64 -fopenmp ./Tools/tools.c ./Tools/dac_tools.c ./DAC/dac_multiplication.c ./DAC/dac_multiplication_parra.c ./DAC/dac_multiplication_strassen.c ./DAC/dac_multiplication_strassen_parra.c ./DAC/dac_multiplication_strassen_combined.c ./DAC/dac_multiplication_alpha.c ./Product/product.c ../test/dac.c -o ../test/dac.out -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group -liomp5 -lpthread -lm -ldl

@@ -1,20 +1,20 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include "../src/Product/product.h"
-#include "../src/Tools/tools.h"
+#include "../src/Product/product.hpp"
+#include "../src/Tools/tools.hpp"
 
 int main()
 {
     int n = 4;
-    int ** A = malloc(n * sizeof(int*));
+    int ** A = (int **)malloc(n * sizeof(int*));
     for (int i = 0; i<n ; i++){
-        A[i] = malloc(n * sizeof(int));
+        A[i] = (int *)malloc(n * sizeof(int));
     }
 
-    int ** B = malloc(n * sizeof(int*));
+    int ** B = (int **)malloc(n * sizeof(int*));
     for (int i = 0; i<n ; i++){
-        B[i] = malloc(n * sizeof(int));
+        B[i] = (int *)malloc(n * sizeof(int));
     }
 
     for (int i = 0; i<n ; i++){
