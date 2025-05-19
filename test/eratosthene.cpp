@@ -3,27 +3,23 @@
 #include <vector>
 #include <cstdlib>
 
-#include "eratosthene.hpp"
+#include "../src/Eratosthene/eratosthene.hpp"
 
 
 BOOST_AUTO_TEST_CASE(test_small_primes) {
-    int resultSize = 0;
-    int *primes = eratostheneSieve(10, &resultSize);
+    std::vector<int> primes = eratostheneSieve(10);
+    int resultSize = primes.size();
 
     std::vector<int> expected = {2, 3, 5, 7};
-    BOOST_CHECK_EQUAL_COLLECTIONS(primes, primes + resultSize, expected.begin(), expected.end());
-
-    free(primes);
+    BOOST_CHECK_EQUAL_COLLECTIONS(primes.begin(), primes.end(), expected.begin(), expected.end());
 }
 
 BOOST_AUTO_TEST_CASE(test_large_primes) {
-    int resultSize = 0;
-    int *primes = eratostheneSieve(50, &resultSize);
+    std::vector<int> primes = eratostheneSieve(50);
+    int resultSize = primes.size();
 
     std::vector<int> expected = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47};
-    BOOST_CHECK_EQUAL_COLLECTIONS(primes, primes + resultSize, expected.begin(), expected.end());
-
-    free(primes);
+    BOOST_CHECK_EQUAL_COLLECTIONS(primes.begin(), primes.end(), expected.begin(), expected.end());
 }
 
 

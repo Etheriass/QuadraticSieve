@@ -1,10 +1,12 @@
+cmake_policy(SET CMP0167 NEW)
 find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 
-# Define the test executable
-add_executable(test_eratosthene eratosthene.cpp)
+# Collect test files
+file(GLOB_RECURSE TEST_SRC CONFIGURE_DEPENDS *.cpp)
 
-# Link the test executable with BOOST libraries
-target_link_libraries(test_eratosthene PRIVATE eratosthene_lib  Boost::unit_test_framework)
-
-# Add the test to the CTest suite
-add_test(NAME EratostheneTests COMMAND test_eratosthene)
+foreach(test_file ${TEST_SRC})
+    get_filename_component(test_name ${test_file} NAME_WE)
+    add_executable(${test_name} ${test_file})
+    target_link_libraries(${test_name} PRIVATE qs_lib Boost::unit_test_framework)
+    add_test(NAME ${test_name} COMMAND ${test_name})
+endforeach()

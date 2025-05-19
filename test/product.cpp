@@ -1,64 +1,118 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
+#define BOOST_TEST_MODULE ProductTest
+#include <boost/test/included/unit_test.hpp>
+#include <ctime>
 #include "../src/Product/product.hpp"
 #include "../src/Tools/tools.hpp"
 
-int main()
-{
-    int n = 4;
-    int ** A = (int **)malloc(n * sizeof(int*));
-    for (int i = 0; i<n ; i++){
-        A[i] = (int *)malloc(n * sizeof(int));
-    }
-
-    int ** B = (int **)malloc(n * sizeof(int*));
-    for (int i = 0; i<n ; i++){
-        B[i] = (int *)malloc(n * sizeof(int));
-    }
-
-    for (int i = 0; i<n ; i++){
-        for (int j = 0; j<n ; j++){
-            A[i][j] = 1;
-            B[i][j] = 1;
+int** create_filled_matrix(int n, int value) {
+    int** mat = (int**)malloc(n * sizeof(int*));
+    for (int i = 0; i < n; ++i) {
+        mat[i] = (int*)malloc(n * sizeof(int));
+        for (int j = 0; j < n; ++j) {
+            mat[i][j] = value;
         }
     }
+    return mat;
+}
 
-    printf("Matrix A:\n");
-    print_square_matrix(A, n);
-    printf("Matrix B:\n");
-    print_square_matrix(B, n);
+void free_matrix(int** mat, int n) {
+    for (int i = 0; i < n; ++i) {
+        free(mat[i]);
+    }
+    free(mat);
+}
 
-    // int* size = malloc(2 * sizeof(int));
-    // size[0]=3;
-    // size[1]=3;
-    // int** r= mat_product(A,size, B, size);
-    // print_square_matrix(r, 3);
+
+bool matrices_equal(int** A, int** B, int n) {
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
+            if (A[i][j] != B[i][j])
+                return false;
+    return true;
+}
+
+BOOST_AUTO_TEST_CASE(test_square_mat_product) {
+    int n = 4;
+    int** A = create_filled_matrix(n, 1);
+    int** B = create_filled_matrix(n, 1);
+
+    int** result = square_mat_product(A, B, n);
+
+
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
+            BOOST_CHECK(result[i][j] == n);
+
+    free_matrix(A, n);
+    free_matrix(B, n);
+    free_matrix(result, n);
+}
+
+BOOST_AUTO_TEST_CASE(test_mat_4x4_product) {
+    int n = 4;
+    int** A = create_filled_matrix(n, 1);
+    int** B = create_filled_matrix(n, 1);
+
+    int** result = mat_4x4_product(A, B);
+
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
+            BOOST_CHECK(result[i][j] == n);
+
+    free_matrix(A, n);
+    free_matrix(B, n);
+    free_matrix(result, n);
+}
+
+BOOST_AUTO_TEST_CASE(test_mat_4x4_product_alphatensor_Z2Z) {
+    int n = 4;
+    int** A = create_filled_matrix(n, 1);
+    int** B = create_filled_matrix(n, 1);
+
+    int** result = mat_4x4_product_alphatensor_Z2Z(A, B);
+
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
+            BOOST_CHECK(result[i][j] == n);
+
+    free_matrix(A, n);
+    free_matrix(B, n);
+    free_matrix(result, n);
+}
+
+BOOST_AUTO_TEST_CASE(test_performance_comparison) {
+    int n = 4;
+    int** A = create_filled_matrix(n, 1);
+    int** B = create_filled_matrix(n, 1);
 
     clock_t start, end;
-    start = clock();
-
-    int** s = square_mat_product(A,B,n);
-    print_square_matrix(s, n);
-    end = clock();
-    double cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-    printf("Time taken: %f seconds\n", cpu_time_used); 
+    double time1, time2, time3;
 
     start = clock();
-    int** t = mat_4x4_product(A,B);
-    print_square_matrix(t, n);
+    int** s = square_mat_product(A, B, n);
     end = clock();
-    cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-    printf("Time taken: %f seconds\n", cpu_time_used); 
-    
+    time1 = ((double)(end - start)) / CLOCKS_PER_SEC;
+
     start = clock();
-    int** v = mat_4x4_product_alphatensor_Z2Z(A,B);
-    print_square_matrix(t, n);
+    int** t = mat_4x4_product(A, B);
     end = clock();
-    cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-    printf("Time taken: %f seconds\n", cpu_time_used); 
+    time2 = ((double)(end - start)) / CLOCKS_PER_SEC;
 
-    // is_mat_equal(s,t,n);
+    start = clock();
+    int** v = mat_4x4_product_alphatensor_Z2Z(A, B);
+    end = clock();
+    time3 = ((double)(end - start)) / CLOCKS_PER_SEC;
 
-    return(0);
+    BOOST_TEST_MESSAGE("square_mat_product time: " << time1 << "s");
+    BOOST_TEST_MESSAGE("mat_4x4_product time: " << time2 << "s");
+    BOOST_TEST_MESSAGE("mat_4x4_product_alphatensor_Z2Z time: " << time3 << "s");
+
+    BOOST_CHECK(matrices_equal(s, t, n));
+    BOOST_CHECK(matrices_equal(s, v, n));
+
+    free_matrix(A, n);
+    free_matrix(B, n);
+    free_matrix(s, n);
+    free_matrix(t, n);
+    free_matrix(v, n);
 }
