@@ -55,3 +55,20 @@ A number is B-smooth if all its prime factors are less than $B$. Pomerance propo
 $
 B = e^{\frac{1}{2}  \sqrt{\log N \log \log N}}
 $
+
+
+## Build
+
+```bash
+mkdir -p build
+cd build
+cmake ..
+make
+```
+
+## Tests
+
+```bash
+cd build
+ctest -V
+```
