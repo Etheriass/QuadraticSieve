@@ -12,7 +12,6 @@ BOOST_AUTO_TEST_CASE(test_square_mat_product) {
 
     int** result = square_mat_product(A, B, n);
 
-
     for (int i = 0; i < n; ++i)
         for (int j = 0; j < n; ++j)
             BOOST_CHECK(result[i][j] == n);

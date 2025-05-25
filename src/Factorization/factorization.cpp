@@ -25,15 +25,10 @@ int *factorization(unsigned long long a, unsigned long long *primes, int sizePri
     return factors;
 }
 
-int *factorizationMod2(unsigned long long a, std::vector<int> primes, int sizePrimes)
+std::vector<int> factorizationMod2(unsigned long long a, std::vector<int> primes)
 {
-    int *factors = (int *)calloc(sizePrimes, sizeof(int));
-    if (factors == NULL)
-    {
-        printf("Memory allocation failed\n");
-        exit(EXIT_FAILURE);
-    }
-    for (int i = 0; i < sizePrimes; i++)
+    std::vector factors(primes.size(), 0);
+    for (int i = 0; i < primes.size(); i++)
     {
         while (a % (unsigned long long)primes[i] == 0)
         {

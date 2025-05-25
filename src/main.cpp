@@ -49,13 +49,11 @@ int main() {
     auto start_factor_matrix = std::chrono::high_resolution_clock::now();
     std::vector<int> M(nbQf*piB, 0);
 
+    
     for (int i = 0; i < nbQf; i++){
-        int *factors = factorizationMod2(Qf[i], primes, piB);
+        std::vector<int> factors = factorizationMod2(Qf[i], primes);
         for (int j = 0; j < piB; j++){
             M[piB*i + j] = factors[j];
-        }
-        if (i == nbQf - 1){
-            free(factors);
         }
     }
     auto end_factor_matrix = std::chrono::high_resolution_clock::now();
