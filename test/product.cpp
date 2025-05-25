@@ -1,11 +1,9 @@
-#define BOOST_TEST_MODULE ProductTest
-#include <boost/test/included/unit_test.hpp>
+#include <gtest/gtest.h>
 #include <ctime>
 #include "../src/Product/product.hpp"
 #include "../src/Tools/tools.hpp"
 
-
-BOOST_AUTO_TEST_CASE(test_square_mat_product) {
+TEST(ProductTest, SquareMatProduct) {
     int n = 4;
     int** A = allocate_square_matrix(n, 1);
     int** B = allocate_square_matrix(n, 1);
@@ -14,14 +12,14 @@ BOOST_AUTO_TEST_CASE(test_square_mat_product) {
 
     for (int i = 0; i < n; ++i)
         for (int j = 0; j < n; ++j)
-            BOOST_CHECK(result[i][j] == n);
+            EXPECT_EQ(result[i][j], n);
 
     free_matrix(A, n);
     free_matrix(B, n);
     free_matrix(result, n);
 }
 
-BOOST_AUTO_TEST_CASE(test_mat_4x4_product) {
+TEST(ProductTest, Mat4x4Product) {
     int n = 4;
     int** A = allocate_square_matrix(n, 1);
     int** B = allocate_square_matrix(n, 1);
@@ -30,14 +28,14 @@ BOOST_AUTO_TEST_CASE(test_mat_4x4_product) {
 
     for (int i = 0; i < n; ++i)
         for (int j = 0; j < n; ++j)
-            BOOST_CHECK(result[i][j] == n);
+            EXPECT_EQ(result[i][j], n);
 
     free_matrix(A, n);
     free_matrix(B, n);
     free_matrix(result, n);
 }
 
-BOOST_AUTO_TEST_CASE(test_mat_4x4_product_alphatensor_Z2Z) {
+TEST(ProductTest, Mat4x4ProductAlphaTensorZ2Z) {
     int n = 4;
     int** A = allocate_square_matrix(n, 1);
     int** B = allocate_square_matrix(n, 1);
@@ -46,14 +44,14 @@ BOOST_AUTO_TEST_CASE(test_mat_4x4_product_alphatensor_Z2Z) {
 
     for (int i = 0; i < n; ++i)
         for (int j = 0; j < n; ++j)
-            BOOST_CHECK(result[i][j] % 2 == n % 2);
+            EXPECT_EQ(result[i][j] % 2, n % 2);
 
     free_matrix(A, n);
     free_matrix(B, n);
     free_matrix(result, n);
 }
 
-BOOST_AUTO_TEST_CASE(test_performance_comparison) {
+TEST(ProductTest, PerformanceComparison) {
     int n = 4;
     int** A = allocate_square_matrix(n, 1);
     int** B = allocate_square_matrix(n, 1);
@@ -76,12 +74,12 @@ BOOST_AUTO_TEST_CASE(test_performance_comparison) {
     end = clock();
     time3 = ((double)(end - start)) / CLOCKS_PER_SEC;
 
-    BOOST_TEST_MESSAGE("square_mat_product time: " << time1 << "s");
-    BOOST_TEST_MESSAGE("mat_4x4_product time: " << time2 << "s");
-    BOOST_TEST_MESSAGE("mat_4x4_product_alphatensor_Z2Z time: " << time3 << "s");
+    std::cout << "square_mat_product time: " << time1 << "s\n";
+    std::cout << "mat_4x4_product time: " << time2 << "s\n";
+    std::cout << "mat_4x4_product_alphatensor_Z2Z time: " << time3 << "s\n";
 
-    BOOST_CHECK(is_matrix_equal(s, t, n));
-    BOOST_CHECK(is_matrix_equal_in_Z2(s, v, n));
+    EXPECT_TRUE(is_matrix_equal(s, t, n));
+    EXPECT_TRUE(is_matrix_equal_in_Z2(s, v, n));
 
     free_matrix(A, n);
     free_matrix(B, n);

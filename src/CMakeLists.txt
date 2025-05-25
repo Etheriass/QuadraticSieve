@@ -1,14 +1,12 @@
 # Gather all source files
 file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS *.cpp *.hpp)
 
+# Exclude main.cpp from the library
+list(REMOVE_ITEM SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
 
 add_library(qs_lib ${SRC_FILES})
 
-# Optional: if you want to build a main binary
+# Now build the actual executable with main.cpp
 add_executable(qs_main main.cpp)
 target_link_libraries(qs_main PRIVATE qs_lib)
-
-# add_library(eratosthene_lib Eratosthene/eratosthene.cpp)
-# target_include_directories(eratosthene_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Eratosthene) # Specify include directories for the library
-
-# target_link_libraries(quadratic_sieve_lib eratosthene_lib m)
+# This ensures that main.cpp is only compiled into the qs_main binary, not into the test binaries.
