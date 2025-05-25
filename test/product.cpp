@@ -4,37 +4,11 @@
 #include "../src/Product/product.hpp"
 #include "../src/Tools/tools.hpp"
 
-int** create_filled_matrix(int n, int value) {
-    int** mat = (int**)malloc(n * sizeof(int*));
-    for (int i = 0; i < n; ++i) {
-        mat[i] = (int*)malloc(n * sizeof(int));
-        for (int j = 0; j < n; ++j) {
-            mat[i][j] = value;
-        }
-    }
-    return mat;
-}
-
-void free_matrix(int** mat, int n) {
-    for (int i = 0; i < n; ++i) {
-        free(mat[i]);
-    }
-    free(mat);
-}
-
-
-bool matrices_equal(int** A, int** B, int n) {
-    for (int i = 0; i < n; ++i)
-        for (int j = 0; j < n; ++j)
-            if (A[i][j] != B[i][j])
-                return false;
-    return true;
-}
 
 BOOST_AUTO_TEST_CASE(test_square_mat_product) {
     int n = 4;
-    int** A = create_filled_matrix(n, 1);
-    int** B = create_filled_matrix(n, 1);
+    int** A = allocate_square_matrix(n, 1);
+    int** B = allocate_square_matrix(n, 1);
 
     int** result = square_mat_product(A, B, n);
 
@@ -50,8 +24,8 @@ BOOST_AUTO_TEST_CASE(test_square_mat_product) {
 
 BOOST_AUTO_TEST_CASE(test_mat_4x4_product) {
     int n = 4;
-    int** A = create_filled_matrix(n, 1);
-    int** B = create_filled_matrix(n, 1);
+    int** A = allocate_square_matrix(n, 1);
+    int** B = allocate_square_matrix(n, 1);
 
     int** result = mat_4x4_product(A, B);
 
@@ -66,14 +40,14 @@ BOOST_AUTO_TEST_CASE(test_mat_4x4_product) {
 
 BOOST_AUTO_TEST_CASE(test_mat_4x4_product_alphatensor_Z2Z) {
     int n = 4;
-    int** A = create_filled_matrix(n, 1);
-    int** B = create_filled_matrix(n, 1);
+    int** A = allocate_square_matrix(n, 1);
+    int** B = allocate_square_matrix(n, 1);
 
     int** result = mat_4x4_product_alphatensor_Z2Z(A, B);
 
     for (int i = 0; i < n; ++i)
         for (int j = 0; j < n; ++j)
-            BOOST_CHECK(result[i][j] == n);
+            BOOST_CHECK(result[i][j] % 2 == n % 2);
 
     free_matrix(A, n);
     free_matrix(B, n);
@@ -82,8 +56,8 @@ BOOST_AUTO_TEST_CASE(test_mat_4x4_product_alphatensor_Z2Z) {
 
 BOOST_AUTO_TEST_CASE(test_performance_comparison) {
     int n = 4;
-    int** A = create_filled_matrix(n, 1);
-    int** B = create_filled_matrix(n, 1);
+    int** A = allocate_square_matrix(n, 1);
+    int** B = allocate_square_matrix(n, 1);
 
     clock_t start, end;
     double time1, time2, time3;
@@ -107,8 +81,8 @@ BOOST_AUTO_TEST_CASE(test_performance_comparison) {
     BOOST_TEST_MESSAGE("mat_4x4_product time: " << time2 << "s");
     BOOST_TEST_MESSAGE("mat_4x4_product_alphatensor_Z2Z time: " << time3 << "s");
 
-    BOOST_CHECK(matrices_equal(s, t, n));
-    BOOST_CHECK(matrices_equal(s, v, n));
+    BOOST_CHECK(is_matrix_equal(s, t, n));
+    BOOST_CHECK(is_matrix_equal_in_Z2(s, v, n));
 
     free_matrix(A, n);
     free_matrix(B, n);
