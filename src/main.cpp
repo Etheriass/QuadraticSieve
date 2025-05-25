@@ -8,7 +8,7 @@
 #include "Friables/friables.hpp"
 #include "Tools/tools.hpp"
 #include "Factorization/factorization.hpp"
-// #include "Krylov/krylov.h"
+#include "Krylov/krylov.hpp"
 
 
 int main() {
@@ -67,22 +67,22 @@ int main() {
     elapsed = end_collection_phase - start_collection_phase;
     printf("Time taken for the collection phase: %f seconds\n", elapsed.count());
 
-    // // Processing phase
-    // auto start_processing_phase = std::chrono::high_resolution_clock::now();
+    // Processing phase
+    auto start_processing_phase = std::chrono::high_resolution_clock::now();
 
-    // int* b = ()malloc(piB * sizeof(int));
-    // for (int i = 0; i < piB; i++){
-    //     b[i] = 1;
-    // }
+    int* b = (int*)malloc(piB * sizeof(int));
+    for (int i = 0; i < piB; i++){
+        b[i] = 1;
+    }
 
     // int*** K = krylov_subspace(M, b, piB);
 
-    // end = clock();
-    // cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-    // printf("Time taken for the proccessing phase: %f seconds\n", cpu_time_used);
+    auto end_processing_phase = std::chrono::high_resolution_clock::now();
+    elapsed = end_processing_phase - start_processing_phase;
+    printf("Time taken for the proccessing phase: %f seconds\n", elapsed.count());
 
 
-    // free(Qf);
+    free(Qf);
 
     return 0;
 }
