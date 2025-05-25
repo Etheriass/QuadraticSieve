@@ -49,7 +49,9 @@ int** allocate_matrix( int rows, int cols);
 * returns:
 * - the allocated square matrix
 */
-int** allocate_square_matrix(int n);
+int** allocate_square_matrix(int n, int value = 0);
+// In C++, default parameters should be specified only once—and that should be in the function declaration, not the definition.
+
 
 /*
 * Free Matrix

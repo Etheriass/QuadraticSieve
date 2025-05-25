@@ -31,8 +31,7 @@ void printMatrix(int **A, int n, int m)
     for (i = 0; i < n; i++)
     {
         printf("[");
-        for (j = 0; j < m; j++)
-        {
+        for (j = 0; j < m; j++){
             printf("%d", A[i][j]);
             if (j < m - 1)
                 printf(" ");
@@ -47,48 +46,19 @@ void printMatrix(int **A, int n, int m)
  * A: matrix to print
  * n: number of rows and columns of A
  */
-// void print_square_matrix(int **A, int n) {
-//     int i, j;
-//     for (i = 0; i < n; i++) {
-//         printf("[");
-//         for (j = 0; j < n; j++) {
-//             printf("%d", A[i][j]);
-//             if (j < n - 1)
-//                 printf(", ");
-//         }
-//         printf("]\n");
-//     }
-// }
-
-void print_square_matrix(int **A, int n)
-{
-    int min, max, w = 0, n1, n2, nw;
-    min = max = A[0][0];
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = 0; j < n; j++)
-        {
-            if (min > A[i][j])
-                min = A[i][j];
-            if (max < A[i][j])
-                max = A[i][j];
-        }
-    }
-    n1 = snprintf(NULL, 0, "%d", min);
-    n2 = snprintf(NULL, 0, "%d", max);
-    nw = n1 > n2 ? n1 : n2;
-
-    for (int i = 0; i < n; i++)
-    {
+void print_square_matrix(int **A, int n) {
+    int i, j;
+    for (i = 0; i < n; i++) {
         printf("[");
-        for (int j = 0; j < n; j++)
-        {
-            printf(" %*d", nw, A[i][j]);
+        for (j = 0; j < n; j++) {
+            printf("%d", A[i][j]);
+            if (j < n - 1)
+                printf(", ");
         }
         printf("]\n");
     }
-    fflush(stdout);
 }
+
 
 /*
  * Allocate Matrix
@@ -116,15 +86,24 @@ int **allocate_matrix(int rows, int cols)
  * returns:
  * - the allocated square matrix
  */
-int **allocate_square_matrix(int n)
+int **allocate_square_matrix(int n, int value)
 {
     int **M = (int **)malloc(n * sizeof(int *));
-    for (int i = 0; i < n; i++)
-    {
-        M[i] = (int *)malloc(n * sizeof(int));
+    if (!value){
+        for (int i = 0; i < n; i++){
+            M[i] = (int *)malloc(n * sizeof(int));
+        }
+    } else {
+        for (int i = 0; i < n; ++i) {
+            M[i] = (int*)malloc(n * sizeof(int));
+            for (int j = 0; j < n; ++j) {
+                M[i][j] = value;
+            }
+        }
     }
     return M;
 }
+
 
 /*
  * Free Matrix
