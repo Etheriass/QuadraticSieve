@@ -72,3 +72,8 @@ make
 cd build
 ctest -V
 ```
+
+## Benchmark
+```bash
+cmake --build . --target run_all_benchmarks
+```
