@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <omp.h>
 #include <vector>
+#include <iostream>
 #include "product.hpp"
 
 int** mat_product(int** A, int* shape_A, int** B, int* shape_B){
@@ -108,6 +109,24 @@ int* square_mat_product_flat_parra(int* A, int* B, int n){
         }
     }
     return M;
+}
+
+std::vector<int> mat_vect_product(std::vector<int> A, std::vector<int> b){
+    int n = b.size();
+    if (A.size() % n != 0){
+        std::cout << "Wrong dimensions" << std::endl;
+        return {};
+    }
+    std::vector<int> res(A.size() / n);
+    int r;
+    for (int i = 0; i < A.size() / n; i++){
+        r = 0;
+        for (int j = 0; j < n; j++){
+            r += A[i*n + j] * b[j];
+        }
+        res[i] = r;
+    }
+    return res;
 }
 
 std::vector<int> square_mat_product_cpp(std::vector<int> A, std::vector<int> B, int n){

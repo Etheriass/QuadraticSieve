@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <vector>
+#include <iostream>
 #include "tools.hpp"
 
 /*
@@ -18,6 +20,15 @@ void transpose(int *A, int *T, int n, int m)
             T[j * n + i] = A[i * m + j];
 }
 
+void printMatrix(std::vector<int> &A, int n, int m){
+    for (int i = 0; i<n; i++){
+        for (int j = 0; j < m; j++){
+            std::cout << A[m*i + j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
 /*
  * Print a matrix
  * --------------
@@ -25,7 +36,7 @@ void transpose(int *A, int *T, int n, int m)
  * n: number of rows of A
  * m: number of columns of A
  */
-void printMatrix(int **A, int n, int m)
+void printArrayMatrix(int **A, int n, int m)
 {
     int i, j;
     for (i = 0; i < n; i++)

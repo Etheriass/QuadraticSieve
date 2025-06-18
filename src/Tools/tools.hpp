@@ -11,6 +11,9 @@
 */
 void transpose(int *A, int *T, int n, int m);
 
+
+void printMatrix(std::vector<int> &A, int n, int m);
+
 /*
 * Print a matrix
 * --------------
@@ -18,7 +21,7 @@ void transpose(int *A, int *T, int n, int m);
 * n: number of rows of A
 * m: number of columns of A
 */
-void printMatrix(int **A, int n, int m);
+void printArrayMatrix(int **A, int n, int m);
 
 /*
 * Print square a matrix

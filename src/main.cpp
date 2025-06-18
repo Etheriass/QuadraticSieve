@@ -13,7 +13,7 @@
 
 int main() {
     
-    unsigned long long N = 184467440737095601;//17595551;18446744073709551615
+    unsigned long long N = 17595551;//184467440737095601;;18446744073709551615
     printf("===============\n");
     printf("Quadratic Sieve\n");
     printf("===============\n");
@@ -21,7 +21,7 @@ int main() {
     
     // Collection phase
     auto start_collection_phase = std::chrono::high_resolution_clock::now();
-    int B = (int)exp(0.5*sqrt(log(N) * log(log(N))));
+    int B = (int)exp(0.5*sqrt(log(N) * log(log(N)))) + 23;
     printf("Choosen B: %d\n", B);
 
     // Eratosthene sieve
@@ -33,7 +33,7 @@ int main() {
     std::cout << " - Eratosthene sieve took: " << elapsed.count() << " s\n";
 
     // Sieving
-    int A = (int)sqrt(N)*0.01;
+    int A = (int)sqrt(N)*1000;
     printf("Number of square to find: %d\n", piB);
     printf("Sieving interval: [%d, %d]\n", (int)sqrt(N) + 1, (int)sqrt(N) + A);
     
@@ -47,19 +47,19 @@ int main() {
 
     // Mod 2 factors Matrix building
     auto start_factor_matrix = std::chrono::high_resolution_clock::now();
-    std::vector<int> M(nbQf*piB, 0);
+    // std::vector<int> M(nbQf*piB, 0);
+    std::vector<int> M(piB*piB, 0);
 
-    
-    for (int i = 0; i < nbQf; i++){
-        std::vector<int> factors = factorizationMod2(Qf[i], primes);
+    for (int i = 0; i < piB; i++){
+        std::vector<int> factorsPowers = factorsPowersMod2(Qf[i], primes);
         for (int j = 0; j < piB; j++){
-            M[piB*i + j] = factors[j];
+            M[piB*i + j] = factorsPowers[j];
         }
     }
     auto end_factor_matrix = std::chrono::high_resolution_clock::now();
     elapsed = end_factor_matrix - start_factor_matrix;
     printf("Time taken to build the factor matrix: %f seconds\n", elapsed.count());
-    // printMatrix(M, nbQf, piB);
+    // printMatrix(M, piB, piB);
 
     auto end_collection_phase  = std::chrono::high_resolution_clock::now();
     elapsed = end_collection_phase - start_collection_phase;
@@ -68,12 +68,8 @@ int main() {
     // Processing phase
     auto start_processing_phase = std::chrono::high_resolution_clock::now();
 
-    int* b = (int*)malloc(piB * sizeof(int));
-    for (int i = 0; i < piB; i++){
-        b[i] = 1;
-    }
-
-    // int*** K = krylov_subspace(M, b, piB);
+    std::vector<int> b (piB, 1);
+    std::vector<std::vector<int>> K = krylov_subspace(M, b, 10);
 
     auto end_processing_phase = std::chrono::high_resolution_clock::now();
     elapsed = end_processing_phase - start_processing_phase;

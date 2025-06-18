@@ -25,23 +25,23 @@ int *factorization(unsigned long long a, unsigned long long *primes, int sizePri
     return factors;
 }
 
-std::vector<int> factorizationMod2(unsigned long long a, std::vector<int> primes)
+std::vector<int> factorsPowersMod2(unsigned long long a, std::vector<int> primes)
 {
-    std::vector factors(primes.size(), 0);
+    std::vector factorsPowers(primes.size(), 0);
     for (int i = 0; i < primes.size(); i++)
     {
         while (a % (unsigned long long)primes[i] == 0)
         {
             a = a / (unsigned long long)primes[i];
-            if (factors[i] == 0)
+            if (factorsPowers[i] == 0)
             {
-                factors[i] = 1;
+                factorsPowers[i] = 1;
             }
             else
             {
-                factors[i] = 0;
+                factorsPowers[i] = 0;
             }
         }
     }
-    return factors;
+    return factorsPowers;
 }

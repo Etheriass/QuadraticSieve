@@ -126,14 +126,37 @@ Pomerance greatly improved this phase with three ideas:
 - Start the sieve near $\sqrt{N}$, to get small $x$.
 
 A number is B-smooth if all its prime factors are less than $B$. Pomerance propose, relying on the prime distribution, for a large number $N$, to choose $B$ as:
-$
-B = e^{\frac{1}{2}  \sqrt{\log N \log \log N}}
-$
+$$ B = e^{\frac{1}{2}  \sqrt{\log N \log \log N}}$$
+
+### Data processing phase
+First, the collected $x_i$ are decomposed into their prime factors. Then we build a
+matrix $M$ where each row corresponds to the power of the prime factors of $x_i$.
+The matrix has $B$ columns and $\pi(B)$ rows.
+
+Remember that a square number is a number that all its prime factors have an
+even power. Therefore, if we find a set of numbers $x$ such that their product has
+only even powers for each prime factor, we have a square number. In other words, we
+have to find a combinaison of the rows of the matrix that gives an even vector.
+
+In order to find such a combinaison, we have to find the kernel in $GF_2$ of the
+transposed matrix modulo 2.
+
+For a standard matrix, we use the Gauss elimination method to find the kernel
+(time complexity of $O(n^3$ )).
+However, in this case, the matrix $M$ is large and sparse, and better methods
+exist to find the kernel.
+
+At the creation of the quadratic sieve algorithm, the kernel was found by the
+Lanczos' algorithm. But now we use Wiedemann's algorithm, which is a linear
+algebra algorithm of time complexity $O(n\omega)$, with $\omega$ the number of
+nonzero coefficients.
+
+
 
 ## Steps summary
 
 1. Choose a smoothness bound $B$.
-2. Use sieving to locate $π(B)+1$ numbers a such that $a^2≡ x \mod N$ is B-smooth.
+2. Use sieving to locate $π(B)+1$ numbers $a$ such that $a^2≡ x \mod N$ is B-smooth.
 3. Decompose the numbers into their prime factors and place the powers in a matrix
 4. Reduce the matrix modulo 2.
 5. Find the kernel of the transposed matrix modulo 2.
