@@ -1,0 +1,462 @@
+\documentclass[a4paper, 11pt]{article} 
+\usepackage{parskip}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsfonts}
+
+\title{Mathematical basis of Quadratic Sieve}
+\author{Alexandre Joly}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+    This document present the Quadratic Sieve algorithm. First, we explain why we need an involving algorithm to factorize a large number. Then, we walk throught the mathematical basis between the algorithm.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+
+\section{RSA cryptosystem}
+
+RSA is an asymmetric encryption system \textit{(public key for encryption and private key for decryption)}. It was published in 1977 by Ron Rivest, Adi Shamir and Leonard Adleman, from whose surnames the initials R, S and A are derived.
+
+\subsection{Principle}
+The aim of RSA is to build a \textbf{one-way} function, meaning it is easy to compute in one direction but computationally hard to reverse.
+
+First, let's posit two required lemmas:
+\begin{enumerate}
+    \item \textbf{Bézout's Identity:} for any two integers $p$ and $q$, there exist integers $x$ and $y$ such that:
+    \begin{equation}
+        px+qy= \gcd(p,q) 
+    \end{equation}
+    Then if $p$ and $q$ are distinct prime numbers:
+    \begin{equation}
+        px+qy= 1
+    \end{equation}
+    \item \textbf{Euler's theorem (generalization of Fermat's Little Theorem)}: if $n$ is a positive integer and $a$ is an integer coprime with $n$, and $\varphi(n)$ is Euler's totient function, then:
+    \begin{equation}
+        a^{\varphi(n)} \equiv 1 \mod n
+    \end{equation}
+    The Euler's totient function can be computed using the Euler's product formula:
+    \begin{equation}
+        \varphi(n) = n \prod_{p|n}\left(1-\frac{1}{p}\right)
+    \end{equation}
+    where $p$ are the distinct prime factors of $n$.
+\end{enumerate}
+
+Now, given:
+\begin{itemize}
+    \item $n = p \times q$ with $p$ and $q$ distinct prime numbers
+    \item $a$ an integer coprime with $n$
+    % \item The Euler's totient $\varphi(n) =\varphi(pq) = pq \times \left(1-\frac{1}{p}\right) \times \left(1-\frac{1}{q}\right) = pq - q - p =(p-1)(q-1)$
+    \item $e$ an integer coprime with $\varphi(n)$ 
+\end{itemize}
+
+Then, according to Bézout's identity, there exist two integers $d$ and $m$ such that:
+\begin{equation}
+    ed - m\varphi(n) = 1 \iff ed = 1 + m\varphi(n)
+\end{equation}
+
+Hence:
+\begin{equation}
+    a^{ed} = a^{1 + m\varphi(n)} = a \times (a^{\varphi(n)})^m
+\end{equation}
+
+Using Euler's theorem:
+\begin{equation}
+    a^{ed} \equiv a \times \left( (1 \mod n)^m  \right)
+\end{equation}
+
+Resulting in the \textbf{RSA theorem}:
+\begin{equation}
+    a^{ed} \equiv a
+\end{equation}
+
+Hence using $e$ and $d$ it is possible to encrypt and decrypt a message.
+
+
+\subsection{Keys generation}
+
+\begin{enumerate}
+\item Choose two distinct large prime numbers: $p$ and $q$
+\item Compute the product named the \textbf{modulus}: $n = p \times q$
+\item Compute the \textit{Euler's totient function} in $n$: $\varphi(n)=\varphi(pq)=(p-1)(q-1)$ \footnote{While the original version of RSA use Euler's totient, modern implementation use Carmichael's function for efficiency but the process is the same as $\lambda(n)$ divide $\varphi(n)$.}
+\item Choose an integer $e$ smaller and coprime to $\varphi(n)$, $e$ is called \textbf{encryption exponent} or \textbf{public key exponent}.
+\item Compute $d$ the \textbf{decryption exponent} or \textbf{private key exponent} which is the \textit{modular multiplicative inverse} of $e$ modulo $\varphi(n)$: $d \equiv e^{-1} \mod \varphi(n)$. This is solved in the form $de \equiv 1 \mod \varphi(n)$ using the \textit{extended Euclidean algorithm}.
+\end{enumerate}
+
+
+Then we have both keys:
+\begin{itemize}
+    \item Public key: $\{n,e\}$
+    \item Private key: $d$
+\end{itemize}
+
+The size of the modulus $n$ in bits is the key length. Nowadays, RSA system use 2048 or 4096 bits keys. To visualize how long it is we can use the logarithm to estimate the number of decimal digits in function of the key length $k$:
+\begin{equation}
+    2^k = 10^n \implies n = k \log_{10}(2)
+\end{equation}
+
+\begin{table}[h!]
+\centering
+    \begin{tabular}{|c|c|}
+        \hline
+        \textbf{Key Size (bits)} & \textbf{Approximate Number of Decimal Digits} \\
+        \hline
+        1024 & 308 \\
+        2048 & 617 \\
+        4096 & 1233 \\
+        \hline
+    \end{tabular}
+\caption{RSA key size and corresponding number of decimal digits}
+\end{table}
+
+The record for the largest RSA number factorization is 829 bits, which is equivalent to 250 decimal digits. This record was achieved in 2020 by a team of researchers from the University of Limoges, using the General Number Field Sieve (GNFS) algorithm and 2700 CPU core-years (2.1 GHz Intel Xeon Gold 6130 as reference). 
+
+\subsection{Encryption and decryption of a message}
+Let the message $M$ be a natural number smaller than $n$.
+
+The ciphertext is then: $C \equiv M^e \mod n$
+
+To recover the initial message we need the private key: $C^d \equiv M^{ed} \equiv M \mod n$
+
+\subsection{Reverse operation}
+We saw that having the decryption exponent $d$ and the modulus $n$ can be used to decode the ciphertext. 
+
+$d$ is found by solving $de \equiv 1 \mod \varphi(n)$, the problem is that if $n$ is large and we don't know its factorisation the computation of $\varphi(n)$ is too long.
+
+Thus finding the factorisation $n = p \times q$ is the key to the key.
+
+\section{Quadratic Sieve by Carl Pomerance (1981)}
+
+The Quadratic Sieve is an \textbf{integer factorization algorithm} for large $N$. It was invented by Carl Pomerance in 1981 as an improvement to Schroeppel's linear sieve that builds on the ideas of Dixon and Kraitchik.
+
+In practice, it is the second fastest algorithm for factorizing integers of more than 100 digits, after the General Number Field Sieve. It is, however, the fastest for integers of less than 100 digits. Given our resources, we will focus on the factorization of integers of less than 100 digits and therefore, the Quadratic Sieve algorithm is relevant.
+
+Carl Pomerance proposed an algorithm in two phases:
+
+
+\subsection{Data collection phase}
+
+The collection phase consists of finding a set of numbers $a_i$ such that $a_i^2 \equiv x_i \mod N$, which will then be combined in the subsequent phase to yield a square on the right side.
+
+
+Pomerance greatly improved this phase with three ideas:
+\begin{itemize}
+    \item Collect only couple $\{a, x\}$ such that $a^2 \equiv x \mod N$ is B-smooth.
+    \item Use the Legendre symbol in a sieve to find such numbers.
+    \item Start the sieve near $\sqrt{N}$ to get small $x$.
+\end{itemize}   
+
+A number is B-smooth if all its prime factors are less than $B$. Pomerance proposes, based on the prime-number distribution, for a large number $N$, to choose $B$ as:
+\begin{equation}
+    B = e^{\frac{1}{2}  \sqrt{\log N \log \log N}}
+\end{equation}
+
+\subsection{Data processing phase}
+First, the collected $x_i$ are decomposed into their prime factors. Then we build a
+matrix $M$ where each row corresponds to the power of the prime factors of $x_i$.
+The matrix has therefore $\pi(B)$ columns.
+
+Remember that a square number is a number that all its prime factors have an
+even power. Therefore, if we find a set of numbers $x$ such that their product has
+only even powers for each prime factor, we have a square number. In other words, we
+have to find a combination of the rows of the matrix that gives an even vector.
+
+In order to find such a combination, we have to find the kernel over $\mathbb{F}_2$ of the transposed matrix modulo 2.
+
+Note that we want a non-trivial kernel, meaning that the matrix should have a rank strictly less than the number of columns. For a square matrix, this is equivalent to the matrix being singular, i.e., having a determinant equal to 0. In the context of our sieve, this condition will be easily satisfied as the diversity of the prime factors in the rows will lead to a linear dependence among them with high probability.
+
+For a standard matrix, we use the Gauss elimination method to find the kernel
+(time complexity of $O(n^3$ )).
+However, in this case, the matrix $M$ is large and sparse, and better methods
+exist to find the kernel.
+
+At the creation of the quadratic sieve algorithm, the kernel was found by the
+Lanczos' algorithm. But now we use Wiedemann's algorithm, which is a linear
+algebra algorithm of time complexity $O(n\omega)$, with $\omega$ the number of
+nonzero coefficients.
+
+\newpage
+
+\section{Wiedemann's algorithm}
+The \textbf{Wiedemann algorithm} \cite{wiedemann} is a probabilistic iterative, projection-based Krylov-subspace method for solving sparse systems of linear equations over finite fields. 
+
+It is based on the fact that when a square matrix is repeatedly applied to a
+vector, the sequence of vectors satisfies a linear recurrence.
+
+Consider a sparse $n \times n$ matrix $A$ and a vector $b$ of size $n$ over a finite field $\mathbb{F}$, the problem is to find a vector $x$ such that:
+\begin{equation}
+    Ax = b
+\end{equation}
+
+\subsection{Origin}
+The \textbf{Cayley-Hamilton theorem} asserts that the square matrix $A$ satisfies its own characteristic equation of degree $n$, giving the identity:
+\begin{equation}
+    P_A(A) = A^n + c_{n-1}A^{n-1} + \dots + c_1A + c_0I = 0
+\end{equation}
+
+However, the \textbf{minimal polynomial} may be of smaller degree $d \leq n$:
+\begin{equation}
+    \label{eqn:minimal}
+    m_A(A) = A^d + m_{d-1}A^{d-1} + \dots + m_1A + m_0I = 0
+\end{equation}
+
+This minimal polynomial retains the same relation but with possibly fewer terms, we don't know $d$ yet but the smaller it is, the faster we will find a solution. Also note that this minimal polynomial is by definition monic (highest-degree coefficient equal to 1).
+
+In the singular case the minimal polynomial has $m_0=0$, so $A$ is not invertible, thus the minimal polynomial is of the form:
+\begin{equation}
+    m_A(A) = A^d + m_{d-1}A^{d-1} + \dots + m_1A = 0
+\end{equation}
+
+We can therefore factor out $A$ at least once (more if $m_1, m_2, \dots, m_{d-1}$ are also zero):
+\begin{equation}
+    A(A^{d-1} + m_{d-1}A^{d-2} + \dots + m_1I) = 0
+\end{equation}
+ 
+We rewrite this as:
+\begin{equation}
+    m_A(A) = A^r q(A) = 0
+\end{equation}
+
+Hence, $q(A)$ is a member of the kernel of $A^r$:
+\begin{equation}
+    im(q(A)) \subseteq \ker(A^r) \iff im(q(A)) \subseteq \ker(A)
+\end{equation}
+
+Then we want to find a vector $w$ such that:
+\begin{equation}
+    w = q(A)v = \sum^d_{i=1} m_i A^i v
+\end{equation}
+
+\subsection{Build the vector $w$}
+
+The definition above of $w$ is a sequence of vectors in the Krylov subspace of $A$ and $v$:
+\begin{equation}
+    \mathcal{K}_d(A,v) = \mathrm{span}\{v, Av, A^2v, \dots, A^{d-1}v\}
+\end{equation}
+
+Now, we need to find the coefficients $m_i$. Note that $m_i$ are field elements, so in our context, they are elements of $\mathbb{F}_2$.
+
+The idea of Wiedemann is to do a \textbf{scalar projection} to turn that matrix problem over $\mathbb{F}^n$ into a one-dimensional recurrence in $\mathbb{F}$.
+
+\begin{enumerate}
+    \item Let's choose two random vectors $u$ and $v$ in $\mathbb{F}^{n}$.
+    \item Define the scalar sequence of length $2n$ (we will see why next): $$s_i = u^TA^iv, \quad i \in [0, 2n-1]$$
+    % As we built $\{s_i\}$ by multiplying the powers of $A$ to the right by $v$ and to the left by $u^T$, the minimal polynomial of $A$ will also annihilate the sequence $\{s_i\}$.
+    % Therefore we reduced the $m_i$ search to a scalar sequence.
+    \item Using the relation of the minimal polynomial we have:
+    $$\sum^d_{i=0} m_i s_{i} = 0$$
+    The only unknowns are the $d$ terms $m_i$ but at this time we only have 1 equation, which is not enough. In order to build $d$ equations we shift the identity by multiplying it by any non-negative power $A^k$ because it doesn't alter the identity:
+    $$m_A(A)A^k=0, \quad k \ge 0$$
+    Giving the scalar sequence:
+    $$\sum^d_{i=0} m_i u^T A^{i+k}v = \sum^d_{i=0} m_i s_{k+i} = 0$$
+    Now we have enough equation to find and fix $d$ terms $m_i$.
+\end{enumerate}
+
+
+
+\subsection{Berlekamp-Massey algorithm}
+
+The \textbf{Berlekamp-Massey} algorithm, given a finite-length scalar sequence $\{s_0,s_1,\dots,s_{N-1}\}$, computes the shortest linear recurrence (i.e., the minimal polynomial) that generates it:
+% In our context, once we have projected our Krylov-sequence to scalars $s_i=u^TA^iv$, Berlekamp-Massey will produce the monic polynomial:
+\begin{equation}
+    C(x) = 1 + C_1x + C_2x^2 + \dots + C_Lx^L
+\end{equation}
+
+However, for the moment we only know the value of $n$ but not $d$. Berlekamp-Massey can only be certain that no shorter recurrence exists once it has processed at least twice the true degree. That is why we will have to use a Krylov sequence of length $2n$.
+
+\textbf{Algorithm:}
+
+\begin{enumerate}
+    \item Initialization:
+    $$C(x)=1, \quad B(x) = 1, \quad T(x) = 1, \quad L = 0, \quad m = 1, \quad b = 1$$
+    \begin{itemize}
+        \item $C(x)$ is the current connection (candidate minimal) polynomial
+        \item $B(x)$ is the previous version of $C$ at the last update
+        \item $L$ is the current length (degree) of $C$
+        \item $m$ counts how many steps since the last update
+        \item $b$ stores the last nonzero discrepancy
+    \end{itemize}
+    \item Iteration, for each $s_i$: \\
+    Compute the discrepancy $d$, it measures how far the current polynomial fails to annihilate the sequence at position $i$:
+        $$d = s_i - \sum^L_{j=1}C_j s_{i-j}$$
+    \begin{itemize}
+        \item If $d=0$, the current minimal polynomial $C(x)$ correctly predicts the term $i$, so no update is needed, simply increment $m \leftarrow m + 1$.
+        \item If $d \neq 0$, we correct $C$ by adding a shifted copy of the last “good” polynomial $B(x)$, scaled so as to cancel that error:
+        \begin{itemize}
+            \item Store a copy of the current minimal polynomial $C(x)$ as the previous minimal polynomial $T(x)$: $T(x) \leftarrow C(x)$
+            \item Update the current minimal polynomial $C(x)$ as: $$C(x)=C(x)-\frac{d}{b}x^mB(x)$$
+            \item if $2L \leq i$:
+            \begin{itemize}
+                \item Update the length $L$: $L\leftarrow i+1-L$
+                \item Update the previous minimal polynomial $B(x) \leftarrow T(x)$, the scaling factor $b \leftarrow d$ and the step counter $m \leftarrow i + 1 - L$
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+\end{enumerate}
+
+
+\subsubsection{Complexity of Berlekamp-Massey:}
+
+Each step requires $O(L)$ operations to compute $d$, resulting in a total $O(L^2)$ complexity.
+$C(x)$ updates cost $O(L)$.
+
+Therefore, the Berlekamp-Massey algorithm has a complexity of $O(d^2)$, with $d \leq n$.
+
+\subsection{Probability of success}
+
+Wiedemann's algorithm relies on the fact that the random vector $u$ chosen from $\mathbb{F}^n$ will project the Krylov sequence onto a space that captures the minimal polynomial of $A$.
+
+It succeeds when the projected sequence $s_i=u^TA^iv$ has the same minimal polynomial as $A$. Failure occurs only if $u$ lies in the orthogonal complement $\mathcal{K}_d(A,v)^\perp$ because then the projection $u^TA^iv$ will not capture the full span of $\mathcal{K}_d(A,v)$.
+
+Because $\dim\mathcal{K}_d^\perp=n-d$, the probability that a random $u$ lies in this orthogonal complement is given by the ratio of the dimensions:
+
+\begin{equation}
+p_{failure}=\frac{\dim\mathcal{K}_d^\perp}{\dim\mathbb{F}_2^n}=\frac{|\mathbb{F}_2|^{n-d}}{|\mathbb{F}_2|^n}=|\mathbb{F}_2|^{-d}
+\end{equation}
+
+
+Thus a single random $u$ already works with probability $1-|\mathbb{F}_2|^{-d}$, and repeating with fresh $u'$s drives the failure rate down exponentially: after $t$ trials it is $|\mathbb{F}_2|^{-dt}$.
+
+In the Quadratic Sieve, $\mathbb{F} = \mathbb{F}_2$ and $d$ is typically small, so the probability of success is very high with just a few random vectors.
+
+Also, in the case of singular matrices, the minimal polynomial has $m_0=0$, so in order to ensure Berlekamp-Massey finds the minimal polynomial such as $m_A(0) = 0$, we need to ensure that $s_0 = u^Tv = 0$. This can be easily checked and if not satisfied, we can simply choose a new random $u$.
+
+\subsection{Complexity of Wiedemann's Algorithm:}
+
+We saw that the complexity of the Berlekamp-Massey algorithm is $O(d^2)$, the other major computation is the construction of the Krylov subspace.
+
+It requires $n$ matrix-vector multiplication that costs $O(\omega)$ field ops where $\omega$ is the number of non-zeros in $A$. Giving a complexity of $O(n\omega)$.
+
+For very sparse matrices, as in the Quadratic Sieve, it is typical that $d \ll \omega$, so the Krylov subspace construction dominate and give an overall complexity of $O(n\omega)$.
+
+\subsection{Conclusion}
+Wiedemann's algorithm is a powerful method for solving large sparse linear systems over finite fields, particularly in the context of exact linear algebra tasks. By leveraging the properties of the minimal polynomial and the Berlekamp-Massey algorithm, it efficiently reduces the problem to a manageable scalar sequence, allowing for the recovery of solutions with a relatively low computational cost.
+
+\subsection{Example:}
+
+Consider the following $7 \times 7$ square sparse matrix $M$ over $\mathbb{F}_2$ that could arise in the Quadratic Sieve context:
+\begin{equation}
+    M = \begin{pmatrix}
+        0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 0 & 0 & 1 & 1 \\
+        0 & 0 & 1 & 1 & 1 & 1 & 0 \\
+        0 & 0 & 1 & 1 & 0 & 0 & 0 \\
+        0 & 0 & 1 & 0 & 1 & 1 & 0 \\
+        0 & 1 & 1 & 0 & 1 & 0 & 1 \\
+        0 & 1 & 0 & 0 & 0 & 1 & 1 \\
+    \end{pmatrix}
+\end{equation}
+
+\begin{enumerate}
+    \item First, let's check that the $M$ has a rank smaller than 7. We can see that columns 2 and 7 are equal, so they are linearly dependent. We can also see that the first column is all zeros, which means it does not contribute to the rank. Therefore, the rank of $M$ is at most 5. Hence, this matrix has a non-trivial kernel. We can apply the Wiedemann's algorithm to find a solution to the system $Mx = 0$.
+    \item We choose the random vector $v$ and $u$, for example:
+    \begin{equation}
+        v = \begin{pmatrix}
+            0 \\
+            0 \\
+            1 \\
+            1 \\
+            1 \\
+            0 \\
+            1 \\
+        \end{pmatrix}
+        \quad \text{and} \quad
+        u = \begin{pmatrix}
+            0 \\
+            0 \\
+            0 \\
+            1 \\
+            1 \\
+            0 \\
+            0 \\
+        \end{pmatrix}
+    \end{equation}
+    We check that $s_0=u^Tv \equiv 0 \mod 2$:
+    \begin{equation}
+        s_0 = u^Tv = 0 \cdot 0 + 0 \cdot 0 + 0 \cdot 1 + 1 \cdot 1 + 1 \cdot 1 + 0 \cdot 0 + 0 \cdot 1 = 2 \equiv 0 \mod 2
+    \end{equation}
+
+    \item We compute the scalar sequence $s_i = u^T M^i v$ for $i=0,1,\dots,13$:
+    \begin{equation}
+        \{s_0, s_1, s_2, s_3, s_4, s_5, s_6, s_7, s_8, s_9, s_{10}, s_{11}, s_{12}, s_{13} \} 
+        = 
+        \left\{0,0,1,0,1,0,0,1,0,1,0,0,1,0\right\}
+    \end{equation}
+    \item We apply the Berlekamp-Massey algorithm to the scalar sequence $\{s_i\}$ to find the minimal polynomial coefficients $m_i$:
+    \begin{equation}
+        m_i = \{1, 1, 1, 1, 1, 0\}
+    \end{equation}
+    \item The minimal polynomial is then:
+    \begin{equation}
+        m_M(x) = 1 + x + x^2 + x^3 + x^4
+    \end{equation}
+    \item We can now compute the solution $x$ using the minimal polynomial:
+    \begin{equation}
+        x = -(M^4 v + M^3 v + M^2 v + M v) \mod 2
+        = \begin{pmatrix}
+            0 \\
+            1 \\
+            0 \\
+            0 \\
+            1 \\
+            1 \\
+            0 \\
+        \end{pmatrix}
+    \end{equation}
+    \item Finally, we can verify that $Mx = 0$:
+    \begin{equation}
+        Mx = 0
+    \end{equation}
+    This confirms that the Wiedemann's algorithm has successfully found a solution to the system $Mx = 0$.
+\end{enumerate}
+
+
+\newpage
+
+\appendix
+
+\section{Wiedemann's algorithm pseudo-code}
+In pseudo-code, Wiedemann's algorithm can be summarized as follows:
+\begin{verbatim}
+function Wiedemann(A, b):
+    n = len(b)
+    u = random_row_vector(n)
+    s = [0] * (2 * n)  # Initialize scalar sequence of length 2n
+    for i in range(2 * n):
+        s[i] = u @ (A ** i) @ b  # Compute scalar sequence
+    C = BerlekampMassey(s)  # C contains the coefficients of the minimal polynomial
+    x = compute_solution(A, b, C)  # Use C to compute the solution
+    return x  # Return the solution vector x
+\end{verbatim}
+
+\section{Berlekamp-Massey algorithm pseudo-code}
+In pseudo-code, the Berlekamp-Massey algorithm can be summarized as follows:
+\begin{verbatim}
+function BerlekampMassey(s):
+    C = [1]  # current polynomial coefficients
+    B = [1]  # previous polynomial coefficients
+    L = 0    # current length of C
+    m = 1    # step counter since last update
+    b = 1    # last nonzero discrepancy
+    for i from 0 to len(s) - 1:
+        d = s[i] + sum(C[j] * s[i - j] for j in range(1, L + 1))
+        if d == 0:
+            m += 1
+        else:
+            T = C[:]  # store current C as T
+            C = [C[j] - (d / b) * (C[j - m] if j >= m else 0) for j in range(len(C))]
+            if 2 * L <= i:
+                L = i + 1 - L
+                B = T[:]
+                b = d
+                m = i + 1 - L
+    return C  # returns the coefficients of the minimal polynomial
+\end{verbatim}
+
+\bibliographystyle{plain}
+\bibliography{biblio}
+
+\end{document}

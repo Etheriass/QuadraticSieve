@@ -80,7 +80,7 @@ std::vector<std::vector<int>> krylov_subspace(std::vector<int> A, std::vector<in
     K[0] = b;
 
     for (int i = 1; i<n; i++){
-        K[i] = mat_vect_product(A, b);
+        K[i] = mat_vect_product(A, K[i-1]);
     }
 
     return K;
