@@ -9,7 +9,7 @@
 #include "Friables/friables.hpp"
 #include "Tools/tools.hpp"
 #include "Factorization/factorization.hpp"
-#include "Krylov/krylov.hpp"
+#include "Wiedemann/wiedemann.hpp"
 #include "Product/dotProduct.hpp"
 
 
@@ -61,7 +61,7 @@ int main() {
     auto end_factor_matrix = std::chrono::high_resolution_clock::now();
     elapsed = end_factor_matrix - start_factor_matrix;
     printf("Time taken to build the factor matrix: %f seconds\n", elapsed.count());
-    // printMatrix(M, piB, piB);
+    printMatrix(M, piB, piB);
 
     auto end_collection_phase  = std::chrono::high_resolution_clock::now();
     elapsed = end_collection_phase - start_collection_phase;
@@ -69,37 +69,10 @@ int main() {
 
     // Processing phase
     auto start_processing_phase = std::chrono::high_resolution_clock::now();
-
-    // Krylov subspace
-    std::vector<int> b (piB, 0);
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(1, 100);
-    for (int i = 0; i < b.size(); ++i) {
-        b[i] = dis(gen);
-    }
-    std::vector<std::vector<int>> K = krylov_subspace(M, b, piB);
-
-    // for (int i = 0; i < piB; i++){
-    //     printMatrix(K[i], piB, 1);
-    //     std::cout << std::endl;
-    // }
-
-    // Scalar Sequence
-    std::vector<int> u (piB, 0);
-    for (int i = 0; i < u.size(); ++i) {
-        u[i] = dis(gen);
-    }
-
-    std::vector<int> S(piB, 0);
-    for(int i = 0; i < piB; i++){
-        S[i] = dot_product(u, K[i]);
-        std::cout << S[i] << " ";
-    }
-
-
-
+    std::vector<int> M_T = transpose(M, piB, piB);
+    printMatrix(M_T, piB, piB);
+    std::vector<int> w = wiedemann(M_T, piB, piB);
+    printRowVec(w);
 
 
     auto end_processing_phase = std::chrono::high_resolution_clock::now();

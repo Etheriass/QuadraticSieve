@@ -4,6 +4,13 @@
 #include <iostream>
 #include "tools.hpp"
 
+int sum_vec(const std::vector<int> &u){
+    int sum = 0;
+    for (const int val: u)
+        sum += val;
+    return sum;
+}
+
 /*
  * Transpose a matrix
  * ------------------
@@ -12,15 +19,37 @@
  * n: number of rows of A
  * m: number of columns of A
  */
-void transpose(int *A, int *T, int n, int m)
-{
-    int i, j;
-    for (i = 0; i < n; i++)
-        for (j = 0; j < m; j++)
+// void transpose(int *A, int *T, int n, int m)
+// {
+//     int i, j;
+//     for (i = 0; i < n; i++)
+//         for (j = 0; j < m; j++)
+//             T[j * n + i] = A[i * m + j];
+// }
+
+std::vector<int> transpose(std::vector<int> A, int n, int m){
+    std::vector<int> T (n*m, 0);
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
             T[j * n + i] = A[i * m + j];
+    return T;
 }
 
-void printMatrix(std::vector<int> &A, int n, int m){
+void printColVec(const std::vector<int>& u){ // pass the vector by const reference to avoid unnecessary copying
+    for (const int element: u){
+        std::cout << element << std::endl;
+    }
+}
+
+void printRowVec(const std::vector<int>& u){
+    std::cout << "[";
+    for (const int element: u){
+        std::cout << element << " ";
+    }
+    std::cout << "]" << std::endl;
+}
+
+void printMatrix(const std::vector<int> &A, int n, int m){
     for (int i = 0; i<n; i++){
         for (int j = 0; j < m; j++){
             std::cout << A[m*i + j] << " ";

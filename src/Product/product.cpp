@@ -129,6 +129,25 @@ std::vector<int> mat_vect_product(std::vector<int> A, std::vector<int> b){
     return res;
 }
 
+std::vector<int> mat_vect_product_F2(const std::vector<int> A, const std::vector<int> b){
+    int n = b.size();
+    if (A.size() % n != 0){
+        std::cout << "Wrong dimensions" << std::endl;
+        return {};
+    }
+    std::vector<int> res(A.size() / n);
+    int r;
+    for (int i = 0; i < A.size() / n; i++){
+        r = 0;
+        for (int j = 0; j < n; j++){
+            // r += A[i*n + j] * b[j];
+            r ^= (A[i*n + j] & b[j]);
+        }
+        res[i] = r;
+    }
+    return res;
+}
+
 std::vector<int> square_mat_product_cpp(std::vector<int> A, std::vector<int> B, int n){
 
     std::vector<int> M(n * n, 0); //Should be faster withou init to 0 but somehow it look faster with it (maybe compiler optimizations)
