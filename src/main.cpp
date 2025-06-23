@@ -4,6 +4,7 @@
 #include <math.h>
 #include <chrono>
 #include <vector>
+#include <numeric>
 #include "Eratosthene/eratosthene.hpp"
 #include "Friables/friables.hpp"
 #include "Tools/tools.hpp"
@@ -14,7 +15,7 @@
 
 int main() {
     
-    unsigned long long N = 17595551;//184467440737095601;;18446744073709551615
+    unsigned long long N = 2041; //17595551;//184467440737095601;;18446744073709551615
     printf("===============\n");
     printf("Quadratic Sieve\n");
     printf("===============\n");
@@ -22,7 +23,7 @@ int main() {
     
     // Collection phase
     auto start_collection_phase = std::chrono::high_resolution_clock::now();
-    int B = (int)exp(0.5*sqrt(log(N) * log(log(N)))) + 23;
+    int B = (int)exp(0.5*sqrt(log(N) * log(log(N))));
     printf("Choosen B: %d\n", B);
 
     // Eratosthene sieve
@@ -34,17 +35,22 @@ int main() {
     std::cout << " - Eratosthene sieve took: " << elapsed.count() << " s\n";
 
     // Sieving
-    int A = (int)sqrt(N)*1000;
+    int A = (int)sqrt(N);
     printf("Number of square to find: %d\n", piB);
     printf("Sieving interval: [%d, %d]\n", (int)sqrt(N) + 1, (int)sqrt(N) + A);
     
     auto start_sieving = std::chrono::high_resolution_clock::now();
     int nbQf;
-    unsigned long long *Qf = QBfriablesV2Long(B, N, A, &nbQf);
+    unsigned long long *X = (unsigned long long *)malloc(A * sizeof(unsigned long long));
+    unsigned long long *Qf = QBfriablesV2Long(B, N, A, &nbQf, X);
     auto end_sieving = std::chrono::high_resolution_clock::now();
     elapsed = end_sieving - start_sieving;
     std::cout << " - QBfriable took: " << elapsed.count() << " s\n";
     printf("Number of Q-B-Friable numbers in [%d, %d]: %d\n", (int)sqrt(N) + 1, (int)sqrt(N) + A, nbQf);
+    // for (int i = 0; i < nbQf; i++){
+    //     printf("{%llu, %llu}, ", X[i], Qf[i]);
+    // }
+    // printf("\n");
 
     // Mod 2 factors Matrix building
     auto start_factor_matrix = std::chrono::high_resolution_clock::now();
@@ -60,7 +66,7 @@ int main() {
     auto end_factor_matrix = std::chrono::high_resolution_clock::now();
     elapsed = end_factor_matrix - start_factor_matrix;
     printf("Time taken to build the factor matrix: %f seconds\n", elapsed.count());
-    printMatrix(M, piB, piB);
+    // printMatrix(M, piB, piB);
 
     auto end_collection_phase  = std::chrono::high_resolution_clock::now();
     elapsed = end_collection_phase - start_collection_phase;
@@ -69,9 +75,24 @@ int main() {
     // Processing phase
     auto start_processing_phase = std::chrono::high_resolution_clock::now();
     std::vector<int> M_T = transpose(M, piB, piB);
-    printMatrix(M_T, piB, piB);
-    std::vector<int> w = wiedemann(M_T, piB, piB);
-    print_row_vec(w);
+    // printMatrix(M_T, piB, piB);
+    std::vector<int> w = wiedemann(M_T, piB, 1000);
+    // print_row_vec(w);
+
+    int a = 1;
+    unsigned long long b = 1;
+    for (int i = 0; i < piB; i++){
+        if (w[i] == 1){
+            a = (a * X[i]) % N;
+            b = (b * Qf[i]);
+        }
+    }
+    b = (unsigned long long)sqrt(b);
+    std::cout << "a = " << a << ", b = " << b << std::endl;
+
+    int d = std::gcd(abs(a - (int)b), N);
+    int d2 = std::gcd(a + (int)b, N);
+    std::cout << "Factor found: {" << d << ", " << d2 << "}" << std::endl;
 
 
     auto end_processing_phase = std::chrono::high_resolution_clock::now();

@@ -261,7 +261,7 @@ unsigned long long power(unsigned long long x, int y)
     return res;
 }
 
-unsigned long long *QBfriablesV2Long(int B, unsigned long long N, int A, int *size)
+unsigned long long *QBfriablesV2Long(int B, unsigned long long N, int A, int *size, unsigned long long *X)
 {
     // printf("N = %llu\n", N);
     ull min = (ull)sqrt(N) + 1;
@@ -286,6 +286,7 @@ unsigned long long *QBfriablesV2Long(int B, unsigned long long N, int A, int *si
         }
         Q[i] = e;
     }
+    unsigned long long *Q_copy = Q;
 
     int count = 0;
     std::vector<unsigned long long> primes = eratostheneSieveLong(B);
@@ -340,6 +341,7 @@ unsigned long long *QBfriablesV2Long(int B, unsigned long long N, int A, int *si
         if (Q[i] == 1)
         {
             Qf[count] = power(min + i, 2) - N;
+            X[count] = min + i;
             count++;
         }
     }
