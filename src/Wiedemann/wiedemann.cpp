@@ -4,16 +4,17 @@
 #include <random>
 #include <iostream>
 #include "../Product/product.hpp"
-#include "../Product/dotProduct.hpp"
 #include "../Tools/tools.hpp"
+#include "../Tools/vectors.hpp"
 #include <optional>
 
-using namespace std;
-
-vector<vector<int>> krylov_subspace(vector<int> &A, vector<int> v, int d)
+/*
+ * Generate the Krulov subspace of A and v.
+ */
+std::vector<std::vector<int>> krylov_subspace(std::vector<int> &A, std::vector<int> v, int d)
 {
     // Initialize the vector of vectors with `n` vectors, each of size v.size()`
-    vector<vector<int>> K(d, vector<int>(v.size()));
+    std::vector<std::vector<int>> K(d, std::vector<int>(v.size()));
     K[0] = v;
 
     for (int i = 1; i < d; i++)
@@ -24,17 +25,17 @@ vector<vector<int>> krylov_subspace(vector<int> &A, vector<int> v, int d)
 /*
  * Generate random vectors u and v in F2^n such that u.v = 0.
  */
-void set_u_v(vector<int> &u, vector<int> &v)
+void set_u_v(std::vector<int> &u, std::vector<int> &v)
 {
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<> dis(0, 1);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, 1);
     for (int i = 0; i < v.size(); ++i)
     {
         v[i] = dis(gen);
         u[i] = dis(gen);
     }
-    while (dot_product(u, v) % 2 != 0)
+    while (dot_product_f2(u, v) != 0)
     {
         for (int i = 0; i < v.size(); ++i)
         {
@@ -43,14 +44,14 @@ void set_u_v(vector<int> &u, vector<int> &v)
     }
 }
 
-vector<int> berlekamp_massey(vector<int> s)
+std::vector<int> berlekamp_massey(std::vector<int> s)
 {
     int n = s.size();
-    vector<int> C(n + 1, 0);
+    std::vector<int> C(n + 1, 0);
     C[0] = 1;
-    vector<int> B(n + 1, 0);
+    std::vector<int> B(n + 1, 0);
     B[0] = 1;
-    vector<int> T;
+    std::vector<int> T;
     int L = 0;
     int m = 1;
     int d = 0;
@@ -81,37 +82,38 @@ vector<int> berlekamp_massey(vector<int> s)
     return std::vector<int>(C.begin(), C.begin() + L + 1);
 }
 
-optional<vector<int>> wiedemann(vector<int> A, int n, int max_iteration)
+/*
+* Wiedemann algorithm to find a non-trivial solution of Ax = 0.
+* A is a square matrix of size n x n.
+* max_iteration is the maximum number of iterations to perform.
+* Return an optional vector x such that Ax = 0, or std::nullopt if no solution is found.
+*/
+std::optional<std::vector<int>> wiedemann(std::vector<int> A, int n, int max_iteration)
 {
 
-    vector<int> u(n, 0);
-    vector<int> v(n, 0);
+    std::vector<int> u(n, 0);
+    std::vector<int> v(n, 0);
 
     int iteration = 0;
     while (iteration < max_iteration)
     {
         set_u_v(u, v);
-        // printRowVec(u);
-        // printRowVec(v);
+        std::vector<std::vector<int>> Kv = krylov_subspace(A, v, 2 * n);
 
-        vector<vector<int>> Kv = krylov_subspace(A, v, 2 * n);
-        // printColVec(Kv[0]);
-
-        vector<int> s(2 * n, 0);
+        std::vector<int> s(2 * n, 0);
         for (int i = 0; i < 2 * n; i++)
-            s[i] = dot_product(u, Kv[i]) % 2;
-        // printRowVec(s);
+            s[i] = dot_product_f2(u, Kv[i]);
 
-        vector<int> C = berlekamp_massey(s);
+        std::vector<int> C = berlekamp_massey(s);
         int d = C.size() - 1;
         if (C[d] != 0)
             continue; // Get new (u,v) because f(0) != 0
 
-        vector<int> q(d);
+        std::vector<int> q(d);
         for (int i = 0; i < d; i++)
             q[i] = C[d - 1 - i];
 
-        vector<int> w(n, 0);
+        std::vector<int> w(n, 0);
         for (int i = 0; i < d; i++)
         {
             if (q[i])
@@ -126,7 +128,7 @@ optional<vector<int>> wiedemann(vector<int> A, int n, int max_iteration)
             continue; // Get new (u,v) because w is one line
         else
         {
-            vector<int> r = mat_vect_product_F2(A, w);
+            std::vector<int> r = mat_vect_product_F2(A, w);
             if (sum_vec(r) == 0)
             {
                 return w;
@@ -134,6 +136,6 @@ optional<vector<int>> wiedemann(vector<int> A, int n, int max_iteration)
         }
         iteration++;
     }
-    cout << "FAIL" << endl;
-    return nullopt;
+    std::cout << "FAIL" << std::endl;
+    return std::nullopt;
 }

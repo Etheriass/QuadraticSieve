@@ -4,12 +4,7 @@
 #include <iostream>
 #include "tools.hpp"
 
-int sum_vec(const std::vector<int> &u){
-    int sum = 0;
-    for (const int val: u)
-        sum += val;
-    return sum;
-}
+
 
 /*
  * Transpose a matrix
@@ -33,20 +28,6 @@ std::vector<int> transpose(std::vector<int> A, int n, int m){
         for (int j = 0; j < m; j++)
             T[j * n + i] = A[i * m + j];
     return T;
-}
-
-void printColVec(const std::vector<int>& u){ // pass the vector by const reference to avoid unnecessary copying
-    for (const int element: u){
-        std::cout << element << std::endl;
-    }
-}
-
-void printRowVec(const std::vector<int>& u){
-    std::cout << "[";
-    for (const int element: u){
-        std::cout << element << " ";
-    }
-    std::cout << "]" << std::endl;
 }
 
 void printMatrix(const std::vector<int> &A, int n, int m){

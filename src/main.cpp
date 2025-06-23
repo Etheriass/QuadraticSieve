@@ -4,13 +4,12 @@
 #include <math.h>
 #include <chrono>
 #include <vector>
-#include <random>
 #include "Eratosthene/eratosthene.hpp"
 #include "Friables/friables.hpp"
 #include "Tools/tools.hpp"
+#include "Tools/vectors.hpp"
 #include "Factorization/factorization.hpp"
 #include "Wiedemann/wiedemann.hpp"
-#include "Product/dotProduct.hpp"
 
 
 int main() {
@@ -72,7 +71,7 @@ int main() {
     std::vector<int> M_T = transpose(M, piB, piB);
     printMatrix(M_T, piB, piB);
     std::vector<int> w = wiedemann(M_T, piB, piB);
-    printRowVec(w);
+    print_row_vec(w);
 
 
     auto end_processing_phase = std::chrono::high_resolution_clock::now();

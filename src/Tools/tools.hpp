@@ -1,8 +1,6 @@
 #ifndef TOOLS_HPP
 #define TOOLS_HPP
 
-int sum_vec(const std::vector<int> &u);
-
 /*
 * Transpose a matrix
 * ------------------
@@ -13,9 +11,6 @@ int sum_vec(const std::vector<int> &u);
 */
 // void transpose(int *A, int *T, int n, int m);
 std::vector<int> transpose(std::vector<int> A, int n, int m);
-
-void printColVec(const std::vector<int>& u);
-void printRowVec(const std::vector<int>& u);
 
 void printMatrix(const std::vector<int> &A, int n, int m);
 
