@@ -5,6 +5,7 @@
 #include <chrono>
 #include <vector>
 #include <numeric>
+#include <utility> 
 #include "Eratosthene/eratosthene.hpp"
 #include "Friables/friables.hpp"
 #include "Tools/tools.hpp"
@@ -16,8 +17,7 @@ typedef unsigned long long ull;
 
 int main()
 {
-
-    ull N = 1844671; // 1844671; 17595551;//184467440737095601;;18446744073709551615
+    ull N = 184467440737095601; // 1844671; 17595551;//184467440737095601;;18446744073709551615
     printf("===============\n");
     printf("Quadratic Sieve\n");
     printf("===============\n");
@@ -30,25 +30,26 @@ int main()
 
     // Eratosthene sieve
     auto start_eratosthene = std::chrono::high_resolution_clock::now();
-    std::vector<int> primes = eratostheneSieve(B); // See to do one eratosthene sieve (other in QBfriable but ull)
+    std::vector<int> primes = eratosthene_sieve(B); // See to do one eratosthene sieve (other in QBfriable but ull)
     int piB = primes.size();
     auto end_eratosthene = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end_eratosthene - start_eratosthene;
     std::cout << " - Eratosthene sieve took: " << elapsed.count() << " s\n";
 
     // Sieving
-    int A = (int)sqrt(N);
+    size_t A = (size_t)sqrt(N);
     printf("Number of square to find: %d\n", piB);
-    printf("Sieving interval: [%d, %d]\n", (int)sqrt(N) + 1, (int)sqrt(N) + A);
+    printf("Sieving interval: [%llu, %llu]\n", (ull)sqrt(N) + 1, (ull)sqrt(N) + A);
 
     auto start_sieving = std::chrono::high_resolution_clock::now();
-    std::vector<ull> X(A);
-    std::vector<ull> Qf = QBfriablesV2Long(N, A, primes, X);
+    std::pair<std::vector<ull>, std::vector<ull>> QfX = QBfriablesV2Long(N, A, primes);
+    std::vector<ull> Qf = QfX.first; // Q-B-Friable numbers
+    std::vector<ull> X = QfX.second; // Corresponding X values
     int nbQf = Qf.size();
     auto end_sieving = std::chrono::high_resolution_clock::now();
     elapsed = end_sieving - start_sieving;
     std::cout << " - QBfriable took: " << elapsed.count() << " s\n";
-    printf("Number of Q-B-Friable numbers in [%d, %d]: %d\n", (int)sqrt(N) + 1, (int)sqrt(N) + A, nbQf);
+    printf("Number of Q-B-Friable numbers in [%llu, %llu]: %d\n", (ull)sqrt(N) + 1, (ull)sqrt(N) + A, nbQf);
     // for (int i = 0; i < nbQf; i++){
     //     printf("{%llu, %llu}, ", X[i], Qf[i]);
     // }
@@ -58,7 +59,7 @@ int main()
     auto start_factor_matrix = std::chrono::high_resolution_clock::now();
     std::vector<int> M(piB * piB, 0);
     for (int i = 0; i < piB; i++){
-        std::vector<int> factorsPowers = factorsPowersMod2(Qf[i], primes);
+        std::vector<int> factorsPowers = factors_powers_f2(Qf[i], primes);
         for (int j = 0; j < piB; j++){
             M[piB*i + j] = factorsPowers[j];
         }
@@ -71,11 +72,11 @@ int main()
     //     {
     //         break;
     //     }
-    //     std::vector<int> factors_powers = factorsPowersMod2(Qf[i], primes);
+    //     std::vector<int> factors_powers = factors_powers_f2(Qf[i], primes);
     //     // print_row_vec(factors_powers);
     //     if (nbQf - removed > piB)
     //     {
-    //         if (sum_vec(factors_powers) < 1)
+    //         if (sum_vec(factors_powers) < 5)
     //         {
     //             // printf("REMOVED");
     //             removed++;
@@ -89,8 +90,7 @@ int main()
     //         M[piB * (i - removed) + j] = factors_powers[j];
     //     }
     // }
-
-    printf("%d removed\n", removed);
+    // printf("%d removed\n", removed);
 
     auto end_factor_matrix = std::chrono::high_resolution_clock::now();
     elapsed = end_factor_matrix - start_factor_matrix;

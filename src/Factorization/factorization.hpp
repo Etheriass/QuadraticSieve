@@ -2,7 +2,6 @@
 #define FACTORIZATION_H
 #include <vector>
 
-int *factorization(unsigned long long a, unsigned long long* primes, int sizePrimes);
-std::vector<int> factorsPowersMod2(unsigned long long a, std::vector<int> primes);
+std::vector<int> factors_powers_f2(unsigned long long a, const std::vector<int> &primes);
 
 #endif
