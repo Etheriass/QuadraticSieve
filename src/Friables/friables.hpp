@@ -14,5 +14,6 @@ int* BfriablesV2( int B, int max);
 int* QBfriables(int B, int N, int A, int* size);
 int* QBfriablesV2(int B, int N, int A, int* size);
 
-unsigned long long *QBfriablesV2Long(int B, unsigned long long N,int A, int *size, unsigned long long *X);
+std::vector<unsigned long long> QBfriablesV2Long(unsigned long long N, int A, std::vector<int> primes, std::vector<unsigned long long> &X);
+
 #endif

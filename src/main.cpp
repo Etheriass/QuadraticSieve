@@ -12,23 +12,25 @@
 #include "Factorization/factorization.hpp"
 #include "Wiedemann/wiedemann.hpp"
 
+typedef unsigned long long ull;
 
-int main() {
-    
-    unsigned long long N = 2041; //17595551;//184467440737095601;;18446744073709551615
+int main()
+{
+
+    ull N = 1844671; // 1844671; 17595551;//184467440737095601;;18446744073709551615
     printf("===============\n");
     printf("Quadratic Sieve\n");
     printf("===============\n");
     printf("Factorisation of %llu: \n", N);
-    
+
     // Collection phase
     auto start_collection_phase = std::chrono::high_resolution_clock::now();
-    int B = (int)exp(0.5*sqrt(log(N) * log(log(N))));
+    int B = (int)exp(0.5 * sqrt(log(N) * log(log(N))));
     printf("Choosen B: %d\n", B);
 
     // Eratosthene sieve
     auto start_eratosthene = std::chrono::high_resolution_clock::now();
-    std::vector<int> primes = eratostheneSieve(B);
+    std::vector<int> primes = eratostheneSieve(B); // See to do one eratosthene sieve (other in QBfriable but ull)
     int piB = primes.size();
     auto end_eratosthene = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end_eratosthene - start_eratosthene;
@@ -38,11 +40,11 @@ int main() {
     int A = (int)sqrt(N);
     printf("Number of square to find: %d\n", piB);
     printf("Sieving interval: [%d, %d]\n", (int)sqrt(N) + 1, (int)sqrt(N) + A);
-    
+
     auto start_sieving = std::chrono::high_resolution_clock::now();
-    int nbQf;
-    unsigned long long *X = (unsigned long long *)malloc(A * sizeof(unsigned long long));
-    unsigned long long *Qf = QBfriablesV2Long(B, N, A, &nbQf, X);
+    std::vector<ull> X(A);
+    std::vector<ull> Qf = QBfriablesV2Long(N, A, primes, X);
+    int nbQf = Qf.size();
     auto end_sieving = std::chrono::high_resolution_clock::now();
     elapsed = end_sieving - start_sieving;
     std::cout << " - QBfriable took: " << elapsed.count() << " s\n";
@@ -54,21 +56,48 @@ int main() {
 
     // Mod 2 factors Matrix building
     auto start_factor_matrix = std::chrono::high_resolution_clock::now();
-    // std::vector<int> M(nbQf*piB, 0);
-    std::vector<int> M(piB*piB, 0);
-
+    std::vector<int> M(piB * piB, 0);
     for (int i = 0; i < piB; i++){
         std::vector<int> factorsPowers = factorsPowersMod2(Qf[i], primes);
         for (int j = 0; j < piB; j++){
             M[piB*i + j] = factorsPowers[j];
         }
     }
+
+    // int removed = 0;
+    // for (int i = 0; i < nbQf; i++)
+    // {
+    //     if (i - removed > piB - 1)
+    //     {
+    //         break;
+    //     }
+    //     std::vector<int> factors_powers = factorsPowersMod2(Qf[i], primes);
+    //     // print_row_vec(factors_powers);
+    //     if (nbQf - removed > piB)
+    //     {
+    //         if (sum_vec(factors_powers) < 1)
+    //         {
+    //             // printf("REMOVED");
+    //             removed++;
+    //             continue;
+    //         }
+    //     }
+    //     // printf("%d:, %d removed\n", i, removed);
+
+    //     for (int j = 0; j < piB; j++)
+    //     {
+    //         M[piB * (i - removed) + j] = factors_powers[j];
+    //     }
+    // }
+
+    printf("%d removed\n", removed);
+
     auto end_factor_matrix = std::chrono::high_resolution_clock::now();
     elapsed = end_factor_matrix - start_factor_matrix;
     printf("Time taken to build the factor matrix: %f seconds\n", elapsed.count());
     // printMatrix(M, piB, piB);
 
-    auto end_collection_phase  = std::chrono::high_resolution_clock::now();
+    auto end_collection_phase = std::chrono::high_resolution_clock::now();
     elapsed = end_collection_phase - start_collection_phase;
     printf("Time taken for the collection phase: %f seconds\n", elapsed.count());
 
@@ -80,27 +109,36 @@ int main() {
     // print_row_vec(w);
 
     int a = 1;
-    unsigned long long b = 1;
-    for (int i = 0; i < piB; i++){
-        if (w[i] == 1){
+    ull b = 1;
+    for (int i = 0; i < piB; i++)
+    {
+        if (w[i] == 1)
+        {
             a = (a * X[i]) % N;
             b = (b * Qf[i]);
         }
     }
-    b = (unsigned long long)sqrt(b);
+    b = (ull)sqrt(b);
     std::cout << "a = " << a << ", b = " << b << std::endl;
 
-    int d = std::gcd(abs(a - (int)b), N);
-    int d2 = std::gcd(a + (int)b, N);
-    std::cout << "Factor found: {" << d << ", " << d2 << "}" << std::endl;
-
+    int gcd1 = std::gcd(abs(a - (int)b), N);
+    int gcd2 = std::gcd(a + (int)b, N);
+    std::cout << "Factor found: {" << gcd1 << ", " << gcd2 << "}" << std::endl;
+    if (gcd1 == 1 & gcd2 == 1)
+    {
+        std::cout << "FAIL: {" << gcd1 << ", " << gcd2 << "}" << "are trivial factor of " << N << std::endl;
+    }
+    else
+    {
+        if (N % gcd1 == 0 & gcd1 != 1)
+            std::cout << "SUCCESS: " << gcd1 << " is a non-trivial factor of " << N << std::endl;
+        if (N % gcd2 == 0 & gcd1 != 1)
+            std::cout << "SUCCESS: " << gcd2 << " is a non-trivial factor of " << N << std::endl;
+    }
 
     auto end_processing_phase = std::chrono::high_resolution_clock::now();
     elapsed = end_processing_phase - start_processing_phase;
     printf("Time taken for the proccessing phase: %f seconds\n", elapsed.count());
-
-
-    free(Qf);
 
     return 0;
 }

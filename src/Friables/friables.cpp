@@ -261,23 +261,16 @@ unsigned long long power(unsigned long long x, int y)
     return res;
 }
 
-unsigned long long *QBfriablesV2Long(int B, unsigned long long N, int A, int *size, unsigned long long *X)
+std::vector<ull> QBfriablesV2Long(unsigned long long N, int A, std::vector<int> primes, std::vector<ull> &X)
 {
-    // printf("N = %llu\n", N);
     ull min = (ull)sqrt(N) + 1;
     ull max = (ull)sqrt(N) + A;
-    // printf("min = %llu, max = %llu\n", min, max);
-    int sizeArray = max - min;
-    unsigned long long *Q = (unsigned long long*)malloc(sizeArray * sizeof(unsigned long long));
-    ull *Qf = (ull *)malloc(sizeArray * sizeof(ull));
-    if (Q == NULL || Qf == NULL)
-    {
-        fprintf(stderr, "Memory allocation failed\n");
-        return NULL;
-    }
+
+    std::vector<ull> Q(A);
+    std::vector<ull> Qf(A);
 
     ull e;
-    for (int i = 0; i < sizeArray; i++)
+    for (size_t i = 0; i < A; i++)
     {
         e = power(min + i, 2) - N;
         while (e % 2 == 0) // Divide by 2 until e is odd to save time
@@ -286,17 +279,16 @@ unsigned long long *QBfriablesV2Long(int B, unsigned long long N, int A, int *si
         }
         Q[i] = e;
     }
-    unsigned long long *Q_copy = Q;
+    std::vector<ull> Q_original = Q;
 
     int count = 0;
-    std::vector<unsigned long long> primes = eratostheneSieveLong(B);
     int nb_primes = primes.size();
     for (int i = 1; i < nb_primes; i++)
     {
         int legendre = LegendreLong(N, primes[i]);
         if (legendre == 0) // If N is a multiple of primes[i]
         {
-            printf("%llu is a multiple of %llu\n", N, primes[i]);
+            printf("%llu is a multiple of %llu\n", N, (ull)primes[i]);
             break;
         }
         if (legendre == 1) // If N is a quadratic residue modulo primes[i]
@@ -322,7 +314,7 @@ unsigned long long *QBfriablesV2Long(int B, unsigned long long N, int A, int *si
                 j++;
             }
             int ecart = a2 - a1;
-            for (int k = a1; k < sizeArray - ecart; k += pk) // There is only 2 multiples of pk by interval of pk
+            for (int k = a1; k < A - ecart; k += pk) // There is only 2 multiples of pk by interval of pk
             {
                 while (Q[k] % pk == 0)
                 {
@@ -336,7 +328,7 @@ unsigned long long *QBfriablesV2Long(int B, unsigned long long N, int A, int *si
         }
     }
 
-    for (int i = 0; i < sizeArray; i++)
+    for (int i = 0; i < A; i++)
     {
         if (Q[i] == 1)
         {
@@ -346,9 +338,6 @@ unsigned long long *QBfriablesV2Long(int B, unsigned long long N, int A, int *si
         }
     }
 
-    Qf = (ull*)realloc(Qf, count * sizeof(Qf[0]));
-    *size = count;
-    
-    free(Q);
+    Qf.resize(count);    
     return Qf;
 }
