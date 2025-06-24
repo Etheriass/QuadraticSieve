@@ -43,7 +43,7 @@ std::vector<int> mat_vect_product(const std::vector<int> &A, const std::vector<i
     return res;
 }
 
-std::vector<int> mat_vect_product_F2(const std::vector<int> &A, const std::vector<int> &b)
+std::vector<int> mat_vect_product_f2(const std::vector<int> &A, const std::vector<int> &b)
 {
     int n = b.size();
     if (A.size() % n != 0)
@@ -61,6 +61,27 @@ std::vector<int> mat_vect_product_F2(const std::vector<int> &A, const std::vecto
         res[i] = r;
     }
     return res;
+}
+
+std::vector<int> mat_product_f2(const std::vector<int> &A, const std::vector<int> &B, int n, int m){
+    std::vector<int> M(n * n, 0);
+
+        // Product
+    int res = 0;
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            res = 0;
+            for (int k = 0; k < m; k++)
+            {
+                // res += (A[i * m + k] * B[k * n + j]) % 2;
+                res ^= (A[i * m + k] & B[k * n + j]) ;
+            }
+            M[i * n + j] = res ;
+        }
+    }
+    return M;
 }
 
 std::vector<int> square_mat_product_cpp(std::vector<int> A, std::vector<int> B, int n)

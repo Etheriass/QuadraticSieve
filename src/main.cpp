@@ -11,6 +11,7 @@
 #include "Tools/tools.hpp"
 #include "Tools/vectors.hpp"
 #include "Factorization/factorization.hpp"
+#include "Product/product.hpp"
 #include "Wiedemann/wiedemann.hpp"
 
 typedef unsigned long long ull;
@@ -50,52 +51,22 @@ int main()
     elapsed = end_sieving - start_sieving;
     std::cout << " - QBfriable took: " << elapsed.count() << " s\n";
     printf("Number of Q-B-Friable numbers in [%llu, %llu]: %d\n", (ull)sqrt(N) + 1, (ull)sqrt(N) + A, nbQf);
-    // for (int i = 0; i < nbQf; i++){
-    //     printf("{%llu, %llu}, ", X[i], Qf[i]);
-    // }
-    // printf("\n");
+
 
     // Mod 2 factors Matrix building
     auto start_factor_matrix = std::chrono::high_resolution_clock::now();
-    std::vector<int> M(piB * piB, 0);
-    for (int i = 0; i < piB; i++){
+    std::vector<int> M(nbQf * piB, 0);
+    for (int i = 0; i < nbQf; i++){
         std::vector<int> factorsPowers = factors_powers_f2(Qf[i], primes);
         for (int j = 0; j < piB; j++){
             M[piB*i + j] = factorsPowers[j];
         }
     }
 
-    // int removed = 0;
-    // for (int i = 0; i < nbQf; i++)
-    // {
-    //     if (i - removed > piB - 1)
-    //     {
-    //         break;
-    //     }
-    //     std::vector<int> factors_powers = factors_powers_f2(Qf[i], primes);
-    //     // print_row_vec(factors_powers);
-    //     if (nbQf - removed > piB)
-    //     {
-    //         if (sum_vec(factors_powers) < 5)
-    //         {
-    //             // printf("REMOVED");
-    //             removed++;
-    //             continue;
-    //         }
-    //     }
-    //     // printf("%d:, %d removed\n", i, removed);
-
-    //     for (int j = 0; j < piB; j++)
-    //     {
-    //         M[piB * (i - removed) + j] = factors_powers[j];
-    //     }
-    // }
-    // printf("%d removed\n", removed);
-
     auto end_factor_matrix = std::chrono::high_resolution_clock::now();
     elapsed = end_factor_matrix - start_factor_matrix;
     printf("Time taken to build the factor matrix: %f seconds\n", elapsed.count());
-    // printMatrix(M, piB, piB);
+    // printMatrix(M, nbQf, piB);
 
     auto end_collection_phase = std::chrono::high_resolution_clock::now();
     elapsed = end_collection_phase - start_collection_phase;
@@ -103,36 +74,91 @@ int main()
 
     // Processing phase
     auto start_processing_phase = std::chrono::high_resolution_clock::now();
-    std::vector<int> M_T = transpose(M, piB, piB);
-    // printMatrix(M_T, piB, piB);
-    std::vector<int> w = wiedemann(M_T, piB, 1000);
-    // print_row_vec(w);
+    // std::vector<int> M_T = transpose(M, nbQf, piB);
+    // // printMatrix(M_T, piB, nbQf);
+    // std::vector<int> MM_T = mat_product_f2(M, M_T, nbQf, piB);
+    // // printf("Matrix MM_T:\n");
+    // // printMatrix(MM_T, nbQf, nbQf);
 
-    int a = 1;
-    ull b = 1;
-    for (int i = 0; i < piB; i++)
+    int m = primes.size();
+    int r = Qf.size();  
+    std::vector<int> MA(r*r);
+    for(int i=0; i<r; ++i) {
+        for(int ip=0; ip<r; ++ip) {
+            int acc = 0;
+            for(int j=0; j<m; ++j)
+                acc ^= (M[i*m + j] & M[ip*m + j]);
+            MA[i*r + ip] = acc;
+        }
+    }
+
+    std::vector<int> w;
+    try
+    {
+        w = wiedemann(MA, nbQf, 1000);
+
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        exit(EXIT_FAILURE);
+    }
+
+
+    ull a = 1;
+    // __uint128_t b = 1;
+    for (int i = 0; i < nbQf; i++)
     {
         if (w[i] == 1)
         {
             a = (a * X[i]) % N;
-            b = (b * Qf[i]);
+            // b = (b * Qf[i]);
         }
     }
-    b = (ull)sqrt(b);
-    std::cout << "a = " << a << ", b = " << b << std::endl;
+    // b = (ull)sqrt(b);
+    // ull sqrt_b = (ull)sqrt(b);
 
-    int gcd1 = std::gcd(abs(a - (int)b), N);
-    int gcd2 = std::gcd(a + (int)b, N);
+    // printf("%llu = %llu\n", b, sqrt_b*sqrt_b);
+
+    std::vector<int> expo(m, 0);
+    for(int i = 0; i < r; ++i) {
+        if (!w[i]) continue;
+        for(int j = 0; j < m; ++j)
+            expo[j] += M[i*m + j];
+    }
+
+    // Now each expo[j] is even (because w is a dependency).
+    // Build b = ∏ prime[j]^(expo[j]/2) mod N:
+    __uint128_t bb = 1;
+    for(int j = 0; j < m; ++j) {
+        int half = expo[j] / 2;
+        while(half--) {
+            bb = (bb * primes[j]) % N;
+        }
+    }
+    ull b = ull(bb);
+
+    std::cout << "a = " << a << ", b = " << b << std::endl;
+    std::cout << "a+b = " << (a + b) << ", b-a = " << (b - a) << std::endl;
+
+    // __uint128_t bma = (__uint128_t)b - (__uint128_t)a;
+    // __uint128_t apb = (__uint128_t)a + (__uint128_t)b;
+    // __uint128_t N128 = (__uint128_t)N;
+    // ull gcd1 = std::gcd(bma, N128);
+    // ull gcd2 = std::gcd(apb, N128);
+
+    ull gcd1 = std::gcd((b + N - a)%N, N);
+    ull gcd2 = std::gcd(a + b, N);
     std::cout << "Factor found: {" << gcd1 << ", " << gcd2 << "}" << std::endl;
     if (gcd1 == 1 & gcd2 == 1)
     {
-        std::cout << "FAIL: {" << gcd1 << ", " << gcd2 << "}" << "are trivial factor of " << N << std::endl;
+        std::cout << "FAIL: {" << gcd1 << ", " << gcd2 << "} are trivial factor of " << N << std::endl;
     }
     else
     {
         if (N % gcd1 == 0 & gcd1 != 1)
             std::cout << "SUCCESS: " << gcd1 << " is a non-trivial factor of " << N << std::endl;
-        if (N % gcd2 == 0 & gcd1 != 1)
+        if (N % gcd2 == 0 & gcd2 != 1)
             std::cout << "SUCCESS: " << gcd2 << " is a non-trivial factor of " << N << std::endl;
     }
 

@@ -1,24 +1,22 @@
-#include <stdlib.h>
-#include <stdio.h>
+
 #include <vector>
 #include <random>
 #include <iostream>
 #include "../Product/product.hpp"
 #include "../Tools/tools.hpp"
 #include "../Tools/vectors.hpp"
-#include <optional>
 
 /*
  * Generate the Krulov subspace of A and v.
  */
-std::vector<std::vector<int>> krylov_subspace(std::vector<int> &A, std::vector<int> v, int d)
+std::vector<std::vector<int>> krylov_subspace(const std::vector<int> &A, const std::vector<int> &v, int d)
 {
     // Initialize the vector of vectors with `n` vectors, each of size v.size()`
     std::vector<std::vector<int>> K(d, std::vector<int>(v.size()));
     K[0] = v;
 
     for (int i = 1; i < d; i++)
-        K[i] = mat_vect_product_F2(A, K[i - 1]);
+        K[i] = mat_vect_product_f2(A, K[i - 1]);
     return K;
 }
 
@@ -88,7 +86,7 @@ std::vector<int> berlekamp_massey(std::vector<int> s)
 * max_iteration is the maximum number of iterations to perform.
 * Return an optional vector x such that Ax = 0, or std::nullopt if no solution is found.
 */
-std::optional<std::vector<int>> wiedemann(std::vector<int> A, int n, int max_iteration)
+std::vector<int> wiedemann(std::vector<int> A, int n, int max_iteration)
 {
 
     std::vector<int> u(n, 0);
@@ -97,6 +95,7 @@ std::optional<std::vector<int>> wiedemann(std::vector<int> A, int n, int max_ite
     int iteration = 0;
     while (iteration < max_iteration)
     {
+        iteration++;
         set_u_v(u, v);
         std::vector<std::vector<int>> Kv = krylov_subspace(A, v, 2 * n);
 
@@ -106,18 +105,18 @@ std::optional<std::vector<int>> wiedemann(std::vector<int> A, int n, int max_ite
 
         std::vector<int> C = berlekamp_massey(s);
         int d = C.size() - 1;
-        if (C[d] != 0)
-            continue; // Get new (u,v) because f(0) != 0
+        // if (C[d] != 0)
+        //     continue; // Get new (u,v) because f(0) != 0
 
-        std::vector<int> q(d);
-        for (int i = 0; i < d; i++)
-            q[i] = C[d - 1 - i];
+        std::vector<int> q(d+1);
+        for (int i = 0; i <= d; i++)
+            q[i] = C[d - i];
 
         std::vector<int> w(n, 0);
-        for (int i = 0; i < d; i++)
+        for (int i = 0; i <= d; i++)
         {
             if (q[i])
-                for (int j = 0; j < d; j++)
+                for (int j = 0; j < n; j++)
                     w[j] = (w[j] + Kv[i][j]) % 2;
         }
 
@@ -128,14 +127,14 @@ std::optional<std::vector<int>> wiedemann(std::vector<int> A, int n, int max_ite
             continue; // Get new (u,v) because w is one line
         else
         {
-            std::vector<int> r = mat_vect_product_F2(A, w);
+            std::vector<int> r = mat_vect_product_f2(A, w);
             if (sum_vec(r) == 0)
             {
+                std::cout << "WIEDEMANN: found a solution after " << iteration << " iterations." << std::endl;
                 return w;
             }
         }
-        iteration++;
     }
-    std::cout << "FAIL" << std::endl;
-    return std::nullopt;
+    throw std::runtime_error("WIEDEMANN: failed to find a solution after " + std::to_string(max_iteration) + " iterations.");
+    return std::vector<int>();
 }
