@@ -20,7 +20,7 @@ std::pair<std::vector<ull>, std::vector<ull>> QBfriablesV2Long(const ull N, cons
     // std::vector<ull> X(A);
 
     for (size_t i = 0; i < A; i++){
-        Q[i] = (range_start+i)*(range_start+i) - N;
+        Q[i] = (range_start+i)*(range_start+i) - N; // Q(x) = (x + sqrt(N))^2 - N
     }
 
     int count = 0;

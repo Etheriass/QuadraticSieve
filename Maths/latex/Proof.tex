@@ -3,14 +3,14 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath,amsfonts}
 
-\title{Mathematical basis of Quadratic Sieve}
+\title{Mathematical basis of the Quadratic Sieve}
 \author{Alexandre Joly}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-    This document present the Quadratic Sieve algorithm. First, we explain why we need an involving algorithm to factorize a large number. Then, we walk throught the mathematical basis between the algorithm.
+    This document present the Quadratic Sieve algorithm. First, we explain why we need an involving algorithm to factorize a large number. Then, we walk throught the mathematical basis of the algorithm.
 \end{abstract}
 
 \tableofcontents
@@ -124,7 +124,7 @@ To recover the initial message we need the private key: $C^d \equiv M^{ed} \equi
 \subsection{Reverse operation}
 We saw that having the decryption exponent $d$ and the modulus $n$ can be used to decode the ciphertext. 
 
-$d$ is found by solving $de \equiv 1 \mod \varphi(n)$, the problem is that if $n$ is large and we don't know its factorisation the computation of $\varphi(n)$ is too long.
+$d$ is found by solving $de \equiv 1 \mod \varphi(n)$. However, if $n$ is large and we don't know its factorisation then the computation of $\varphi(n)$ is too long.
 
 Thus finding the factorisation $n = p \times q$ is the key to the key.
 
@@ -134,49 +134,93 @@ The Quadratic Sieve is an \textbf{integer factorization algorithm} for large $N$
 
 In practice, it is the second fastest algorithm for factorizing integers of more than 100 digits, after the General Number Field Sieve. It is, however, the fastest for integers of less than 100 digits. Given our resources, we will focus on the factorization of integers of less than 100 digits and therefore, the Quadratic Sieve algorithm is relevant.
 
-Carl Pomerance proposed an algorithm in two phases:
 
+\subsection{Principle}
+In the field of factorization, \textit{Pierre de Fermat (17th century)} is a
+major figure. He was the first to propose a method to factorize a number $N$
+using the representation of an odd number as the difference of two squares:
+\begin{equation}
+    N = a^2 - b^2 = (a + b) \times (a - b)
+\end{equation}
 
-\subsection{Data collection phase}
+Fermat proposed to search the smallest $a \geq \lceil \sqrt{N} \rceil$ such that $a^2 - N$ is a perfect square, requiring $O(\sqrt{N})$ trials in the worst case. In its simplest form, Fermat's method might be slower than trial division but this idea inspired many other mathematicians, including \textit{Maurice Kraitchik}.
 
-The collection phase consists of finding a set of numbers $a_i$ such that $a_i^2 \equiv x_i \mod N$, which will then be combined in the subsequent phase to yield a square on the right side.
+In the 1920s, Kraitchik proposed that instead of looking for a difference of
+two squares $N = a^2 - b^2$, we could look for a difference of two squares that
+is a multiple of $N$. In other words, a number that is a square modulo $N$:
+\begin{equation}
+    a^2 \equiv b^2 \mod{N}, \quad \text{with} \quad a \not\equiv \pm b \mod{N} \iff a^2 - b^2 \equiv 0 \mod{N}
+\end{equation}
+Equivalent to:
+\begin{equation}
+    \left\{
+    \begin{array}{ll}
+        (a - b) \times (a + b) \ \text{is a multiple of N} \\
+        (a-b) \ \text{and} \ (a+b) \ \text{are not multiples of N (trivial case)}
+    \end{array}
+    \right.
+\end{equation}
+Thus, $N$ has a non-trivial factor with at least one of $(a-b)$ and $(a+b).$
 
+\textbf{So, $pgcd(a+b,N)$ and/or $pgcd(a-b,N)$ are non-trivial factors of $N$.}
+
+\subsection{Kraitchik Method}
+
+To find the square numbers $a^2$ and $b^2$, Kraitchik compute several values of what we now call the \textbf{Kraitchik polynom:}
+\begin{equation}
+    Q(x_i) = x_i^2 - N
+\end{equation}
+
+Then, Kraitchik looks for a combination of the $Q(x_i)$ that form a square number. An easy way to do so is to factor all $Q(x_i)$ and find a combination giving a number with all factor exponent even.
+
+The combination gives us the square we are looking for:
+\begin{equation}
+    (x_1^2 - N)(x_2^2 - N)...(x_k^2 - N) = b^2
+\end{equation}
+\begin{equation}
+    \prod_{i=1}^{k} (x_i^2 - N) \equiv  \prod_{i=1}^{k} x_i^2 \mod N, \quad \text{let} \quad a = \prod_{i=1}^{k} x_i
+\end{equation}
+\begin{equation}
+    a^2 \equiv b^2 \mod N
+\end{equation}
+
+\subsection{Dixon technique}
+
+First we need to introduce the \textbf{smootness of a number}:
+a number is $B$-smooth if all its prime factors are less than $B$.
+
+To improve the Kraitchik method, Dixon propose to compute only $Q(x_i)$ that are $B$-smooth, with a relatively small $B$. We call these numbers \textbf{relations}.
+
+Dixon propose to collect the $Q(x_i)$ that are $B$-smooth. Then build a matrix $M$ where each row corresponds to the power of the prime factors of $Q(x_i)$. The matrix has therefore $\pi(B)$ columns.
+
+Remember that a square number is a number that all its prime factors have an even power. Therefore, if we find a set of relations such that their product has only even powers for each prime factor, we obtain a square number. In other words, we have to find a combination of the rows of the matrix that gives an even vector.
+
+In order to find such a combination, we have to find the kernel over $\mathbb{F}_2$ of the transposed matrix modulo 2.
+
+Note that we want a non-trivial kernel, meaning that the matrix should have a rank strictly less than the number of columns. To ensure this we need to collect at least $\pi(B)+1$ relations.
+
+For a standard matrix, we use the Gauss elimination method to find the kernel
+($O(n^3$)). However, in this case, the matrix $M$ is large and sparse, and better methods exist to find the kernel.
+
+\subsection{Schroeppel's linear sieve}
+In 1977, Richard C. Schroeppel introduced the \textbf{linear sieve}, applying a sieve over pairs $(i,j)$ in an interval around $\lfloor \sqrt{N} \rfloor$ to mark off primes in the factor base and rapidly identify those $(r+i)(r+j)-N$ that are smooth. 
+
+Instead of trial-dividing each value, one “sieves” like in the Sieve of Eratosthenes, dramatically reducing the cost to collect enough congruences. 
+
+\subsection{Carl Pomerance improvements}
 
 Pomerance greatly improved this phase with three ideas:
 \begin{itemize}
-    \item Collect only couple $\{a, x\}$ such that $a^2 \equiv x \mod N$ is B-smooth.
     \item Use the Legendre symbol in a sieve to find such numbers.
     \item Start the sieve near $\sqrt{N}$ to get small $x$.
 \end{itemize}   
 
-A number is B-smooth if all its prime factors are less than $B$. Pomerance proposes, based on the prime-number distribution, for a large number $N$, to choose $B$ as:
+Pomerance proposes, based on the prime-number distribution, for a large number $N$, to choose $B$ as:
 \begin{equation}
     B = e^{\frac{1}{2}  \sqrt{\log N \log \log N}}
 \end{equation}
 
-\subsection{Data processing phase}
-First, the collected $x_i$ are decomposed into their prime factors. Then we build a
-matrix $M$ where each row corresponds to the power of the prime factors of $x_i$.
-The matrix has therefore $\pi(B)$ columns.
-
-Remember that a square number is a number that all its prime factors have an
-even power. Therefore, if we find a set of numbers $x$ such that their product has
-only even powers for each prime factor, we have a square number. In other words, we
-have to find a combination of the rows of the matrix that gives an even vector.
-
-In order to find such a combination, we have to find the kernel over $\mathbb{F}_2$ of the transposed matrix modulo 2.
-
-Note that we want a non-trivial kernel, meaning that the matrix should have a rank strictly less than the number of columns. For a square matrix, this is equivalent to the matrix being singular, i.e., having a determinant equal to 0. In the context of our sieve, this condition will be easily satisfied as the diversity of the prime factors in the rows will lead to a linear dependence among them with high probability.
-
-For a standard matrix, we use the Gauss elimination method to find the kernel
-(time complexity of $O(n^3$ )).
-However, in this case, the matrix $M$ is large and sparse, and better methods
-exist to find the kernel.
-
-At the creation of the quadratic sieve algorithm, the kernel was found by the
-Lanczos' algorithm. But now we use Wiedemann's algorithm, which is a linear
-algebra algorithm of time complexity $O(n\omega)$, with $\omega$ the number of
-nonzero coefficients.
+At the creation of the quadratic sieve algorithm, the kernel was found by the Lanczos' algorithm. But now we use Wiedemann's algorithm, which is a linear algebra algorithm of time complexity $O(n\omega)$, with $\omega$ the number of nonzero coefficients.
 
 \newpage
 
@@ -335,7 +379,7 @@ For very sparse matrices, as in the Quadratic Sieve, it is typical that $d \ll \
 \subsection{Conclusion}
 Wiedemann's algorithm is a powerful method for solving large sparse linear systems over finite fields, particularly in the context of exact linear algebra tasks. By leveraging the properties of the minimal polynomial and the Berlekamp-Massey algorithm, it efficiently reduces the problem to a manageable scalar sequence, allowing for the recovery of solutions with a relatively low computational cost.
 
-\subsection{Example:}
+\section{Example}
 
 Consider the following $7 \times 7$ square sparse matrix $M$ over $\mathbb{F}_2$ that could arise in the Quadratic Sieve context:
 \begin{equation}
