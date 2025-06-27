@@ -18,6 +18,7 @@ typedef unsigned long long ull;
 
 int main()
 {
+    auto start = std::chrono::high_resolution_clock::now();
     ull N = 184467440737095601; // 1844671; 17595551;//184467440737095601;;18446744073709551615
     printf("===============\n");
     printf("Quadratic Sieve\n");
@@ -69,7 +70,6 @@ int main()
     auto end_factor_matrix = std::chrono::high_resolution_clock::now();
     elapsed = end_factor_matrix - start_factor_matrix;
     printf("Time taken to build the factor matrix: %f seconds\n", elapsed.count());
-    // printMatrix(M, nbQf, piB);
 
     auto end_collection_phase = std::chrono::high_resolution_clock::now();
     elapsed = end_collection_phase - start_collection_phase;
@@ -77,15 +77,15 @@ int main()
 
     // Processing phase
     auto start_processing_phase = std::chrono::high_resolution_clock::now();
+
     std::vector<int> M_T = transpose(M, nbQf, piB);
-    // // printMatrix(M_T, piB, nbQf);
     std::vector<int> MM_T = mat_product_f2(M, M_T, nbQf, piB);
-    // // printf("Matrix MM_T:\n");
-    // // printMatrix(MM_T, nbQf, nbQf);
-
-
+    
+    auto start_kernel_search = std::chrono::high_resolution_clock::now();
     std::vector<int> w = wiedemann(MM_T, nbQf, 1000);
-    // print_row_vec(w);
+    auto end_kernel_search = std::chrono::high_resolution_clock::now();
+    elapsed = end_kernel_search - start_kernel_search;
+    printf("Time taken for the kernel search: %f seconds\n", elapsed.count());
 
     __uint128_t aa = 1, bb = 1;
     for (int i = 0; i < nbQf; i++)
@@ -93,7 +93,6 @@ int main()
         if (w[i] == 1)
             aa = (aa * X[i]) % N;
     }
-    ull a = ull(aa);
 
     std::vector<int> E(piB, 0);
     for(int i = 0; i < nbQf; ++i){
@@ -103,15 +102,14 @@ int main()
     }
 
     for(int j = 0; j < piB; ++j){
-        int half = E[j]/2;    // guaranteed integer
-        while(half--) bb = (bb * primes[j]) % N;
+        int half = E[j]/2;
+        while(half--) 
+            bb = (bb * primes[j]) % N;
     }
-    ull b = ull(bb);
 
 
-    std::cout << "a = " << a << ", b = " << b << std::endl;
-    std::cout << "a+b = " << (a + b) % N << ", b-a = " << (b + N - a) % N << std::endl;
-
+    std::cout << "a = " << ull(aa) << ", b = " << ull(bb) << std::endl;
+    std::cout << "a+b = " << (ull(aa) + ull(bb)) % N << ", b-a = " << (ull(bb) + N - ull(aa)) % N << std::endl;
 
     ull gcd1 = std::gcd((bb + N - aa) % N, N);
     ull gcd2 = std::gcd((aa + bb) % N, N);
@@ -131,6 +129,10 @@ int main()
     auto end_processing_phase = std::chrono::high_resolution_clock::now();
     elapsed = end_processing_phase - start_processing_phase;
     printf("Time taken for the proccessing phase: %f seconds\n", elapsed.count());
+
+    auto end = std::chrono::high_resolution_clock::now();
+    elapsed = end - start;
+    printf("Total time taken: %f seconds\n", elapsed.count());
 
     return 0;
 }
