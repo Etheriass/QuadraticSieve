@@ -8,15 +8,15 @@
 \contentsline {subsection}{\numberline {2.2}Kraitchik Method}{4}{}%
 \contentsline {subsection}{\numberline {2.3}Dixon technique}{5}{}%
 \contentsline {subsection}{\numberline {2.4}Schroeppel's linear sieve}{5}{}%
-\contentsline {subsection}{\numberline {2.5}Carl Pomerance improvements}{5}{}%
-\contentsline {section}{\numberline {3}Wiedemann's algorithm}{6}{}%
-\contentsline {subsection}{\numberline {3.1}Origin}{6}{}%
-\contentsline {subsection}{\numberline {3.2}Build the vector $w$}{7}{}%
-\contentsline {subsection}{\numberline {3.3}Berlekamp-Massey algorithm}{7}{}%
-\contentsline {subsubsection}{\numberline {3.3.1}Complexity of Berlekamp-Massey:}{8}{}%
-\contentsline {subsection}{\numberline {3.4}Probability of success}{8}{}%
-\contentsline {subsection}{\numberline {3.5}Complexity of Wiedemann's Algorithm:}{9}{}%
-\contentsline {subsection}{\numberline {3.6}Conclusion}{9}{}%
-\contentsline {section}{\numberline {4}Example}{9}{}%
-\contentsline {section}{\numberline {A}Wiedemann's algorithm pseudo-code}{11}{}%
-\contentsline {section}{\numberline {B}Berlekamp-Massey algorithm pseudo-code}{11}{}%
+\contentsline {subsection}{\numberline {2.5}Pomerance}{6}{}%
+\contentsline {section}{\numberline {3}Wiedemann's algorithm}{7}{}%
+\contentsline {subsection}{\numberline {3.1}Origin}{7}{}%
+\contentsline {subsection}{\numberline {3.2}Build the vector $w$}{8}{}%
+\contentsline {subsection}{\numberline {3.3}Berlekamp-Massey algorithm}{8}{}%
+\contentsline {subsubsection}{\numberline {3.3.1}Complexity of Berlekamp-Massey:}{9}{}%
+\contentsline {subsection}{\numberline {3.4}Probability of success}{9}{}%
+\contentsline {subsection}{\numberline {3.5}Complexity of Wiedemann's Algorithm:}{10}{}%
+\contentsline {subsection}{\numberline {3.6}Conclusion}{10}{}%
+\contentsline {section}{\numberline {4}Example}{10}{}%
+\contentsline {section}{\numberline {A}Wiedemann's algorithm pseudo-code}{12}{}%
+\contentsline {section}{\numberline {B}Berlekamp-Massey algorithm pseudo-code}{12}{}%

@@ -162,52 +162,94 @@ Equivalent to:
 \end{equation}
 Thus, $N$ has a non-trivial factor with at least one of $(a-b)$ and $(a+b).$
 
-\textbf{So, $pgcd(a+b,N)$ and/or $pgcd(a-b,N)$ are non-trivial factors of $N$.}
+\textbf{So, $\gcd(a+b,N)$ and/or $\gcd(a-b,N)$ are non-trivial factors of $N$.}
 
 \subsection{Kraitchik Method}
 
-To find the square numbers $a^2$ and $b^2$, Kraitchik compute several values of what we now call the \textbf{Kraitchik polynom:}
+To find squares $a^2$ and $b^2$ satisfying the necessary congruence conditions, Kraitchik computed values from what we now call the \textbf{Kraitchik polynomial}:
 \begin{equation}
-    Q(x_i) = x_i^2 - N
+Q(x_i) = x_i^2 - N
 \end{equation}
 
-Then, Kraitchik looks for a combination of the $Q(x_i)$ that form a square number. An easy way to do so is to factor all $Q(x_i)$ and find a combination giving a number with all factor exponent even.
+Kraitchik then sought combinations of these values that produce a perfect square. An effective strategy involves factoring each $Q(x_i)$ and identifying combinations such that the product of these factors yields even exponents.
 
-The combination gives us the square we are looking for:
+Specifically, the combination yields the desired square:
 \begin{equation}
-    (x_1^2 - N)(x_2^2 - N)...(x_k^2 - N) = b^2
+    (x_1^2 - N)(x_2^2 - N) \dots (x_k^2 - N) = b^2
 \end{equation}
+This implies:
 \begin{equation}
-    \prod_{i=1}^{k} (x_i^2 - N) \equiv  \prod_{i=1}^{k} x_i^2 \mod N, \quad \text{let} \quad a = \prod_{i=1}^{k} x_i
+    \prod_{i=1}^{k} (x_i^2 - N) \equiv \prod_{i=1}^{k} x_i^2 \mod N, \quad \text{with} \quad a = \prod_{i=1}^{k} x_i
 \end{equation}
+Therefore, we have:
 \begin{equation}
     a^2 \equiv b^2 \mod N
 \end{equation}
+which can then be exploited to factor the integer $N$.
 
 \subsection{Dixon technique}
 
-First we need to introduce the \textbf{smootness of a number}:
-a number is $B$-smooth if all its prime factors are less than $B$.
+Before discussing Dixon's technique, we define the \textbf{smoothness of a number}. A number is said to be $B$-smooth if all its prime factors are less than or equal to $B$.
 
-To improve the Kraitchik method, Dixon propose to compute only $Q(x_i)$ that are $B$-smooth, with a relatively small $B$. We call these numbers \textbf{relations}.
+Dixon's key improvement was collecting only values $Q(x_i)$ that are $B$-smooth. With a suitably chosen small $B$, identifying combinations of these smooth values becomes significantly easier. We thus define a \textbf{factor base} consisting of all primes less than or equal to $B$ and denote its size by $\pi(B)$. The $B$-smooth values we select are termed \textbf{relations}.
 
-Dixon propose to collect the $Q(x_i)$ that are $B$-smooth. Then build a matrix $M$ where each row corresponds to the power of the prime factors of $Q(x_i)$. The matrix has therefore $\pi(B)$ columns.
+Next, we construct a matrix $M$ where each row represents the exponent vector of prime factors for each relation $Q(x_i)$. Hence, the matrix $M$ has $\pi(B)$ columns, one for each prime in the factor base.
 
-Remember that a square number is a number that all its prime factors have an even power. Therefore, if we find a set of relations such that their product has only even powers for each prime factor, we obtain a square number. In other words, we have to find a combination of the rows of the matrix that gives an even vector.
+A key observation is that a perfect square has only even exponents in its prime factorization. Thus, if we find a combination of relations whose exponents sum to an even vector, we obtain a perfect square. Formally, this corresponds to finding a combination of rows of $M$ whose sum is a zero vector modulo 2.
 
-In order to find such a combination, we have to find the kernel over $\mathbb{F}_2$ of the transposed matrix modulo 2.
+To identify such combinations, we find the kernel of the transposed matrix $M^T$ over the finite field $\mathbb{F}_2$. A non-trivial kernel requires the rank of $M$ to be strictly less than the number of columns, necessitating at least $\pi(B)+1$ relations.
 
-Note that we want a non-trivial kernel, meaning that the matrix should have a rank strictly less than the number of columns. To ensure this we need to collect at least $\pi(B)+1$ relations.
-
-For a standard matrix, we use the Gauss elimination method to find the kernel
-($O(n^3$)). However, in this case, the matrix $M$ is large and sparse, and better methods exist to find the kernel.
+In general, finding the kernel of a matrix can be performed using Gaussian elimination, which has a complexity of $O(n^3)$. However, in this context, the matrix $M$ is typically large and sparse, motivating the use of more efficient methods specialized for sparse linear algebra.
 
 \subsection{Schroeppel's linear sieve}
-In 1977, Richard C. Schroeppel introduced the \textbf{linear sieve}, applying a sieve over pairs $(i,j)$ in an interval around $\lfloor \sqrt{N} \rfloor$ to mark off primes in the factor base and rapidly identify those $(r+i)(r+j)-N$ that are smooth. 
+In 1977, Schroeppel proposed an important refinement of Dixon's random-sampling approach by replacing it with an efficient sieving process on a two-dimensional polynomial:
+\begin{equation}
+Q(i,j) = (r+i)(r+j) - N, \quad \text{where} \quad r = \bigl\lceil\sqrt{N}\bigr\rceil
+\end{equation}
 
-Instead of trial-dividing each value, one “sieves” like in the Sieve of Eratosthenes, dramatically reducing the cost to collect enough congruences. 
+Sieving in two dimensions offers two main advantages. First, it generates a richer set of candidate values around zero—by varying both $i$ and $j$, one explores a full grid of residues, increasing the density of potential smooth numbers. Second, the 2D layout improves memory locality and allows parallel sieving across rows or columns, yielding practical speedups on modern hardware.
 
-\subsection{Carl Pomerance improvements}
+To clearly understand Schroeppel's sieve, we first recall the concept of \textbf{residue classes}. In modular arithmetic, the residue class modulo $n$ of an integer $a$ is the set of all integers congruent to $a$ modulo $n$:
+\begin{equation}
+[a]_n = { a + kn : k \in \mathbb{Z}}
+\end{equation}
+All elements within a residue class $[a]_n$ are indistinguishable modulo $n$.
+
+Using this concept, the sieving proceeds as follows:
+
+For each prime $p$ in our chosen factor base, we first solve the congruence
+\begin{equation}
+Q(x) \equiv 0 \mod p
+\end{equation}
+to find the two distinct roots $\alpha, \beta$ modulo $p$. Positions corresponding to these residue classes $x \equiv \alpha, \beta \mod p$ in a sieve array are marked (or "crossed off") by adding the value $\log p$.
+
+The rationale behind adding logarithms is to efficiently approximate factorization. When a prime $p$ divides $Q(x)$, the logarithmic value of $|Q(x)|$ decreases by approximately $\log p$ for each occurrence of $p$ as a factor. We initialize an array $S[x]$ to zero, representing the logarithmic accumulations. Each time we identify a residue class modulo $p$, we increment by $\log p$:
+\begin{equation}
+S[x] \leftarrow S[x] + \log p
+\end{equation}
+
+After processing all primes in the factor base, we compare the accumulated values $S[x]$ with the logarithmic magnitude of $|Q(x)|$. If the total of recorded logarithms in $S[x]$ closely matches $\log|Q(x)|$ (within a small threshold accounting for rounding errors), this strongly indicates that $Q(x)$ factors completely over the factor base, identifying it as $B$-smooth. These identified smooth values are exactly the "relations" required to build the necessary matrix for subsequent steps.
+
+This sieve reduces the cost of candidate testing dramatically and laid the groundwork for the first large-scale Quadratic Sieve implementations.
+
+\subsection{Pomerance}
+In 1981, Carl Pomerance introduced the Quadratic Sieve, refining Schroeppel's linear sieve by simplifying the polynomial and significantly optimizing the selection process of candidate smooth numbers.
+
+Pomerance proposed sieving the simpler polynomial:
+\begin{equation}
+Q(x) = (x + r)^2 - N, \quad \text{where} \quad r = \bigl\lceil\sqrt{N}\bigr\rceil
+\end{equation}
+This single-variable polynomial reduces computational complexity by focusing the sieving on one-dimensional intervals.
+
+The key improvement is in computational efficiency: by using a single-variable polynomial, the process of sieving for smooth numbers became significantly faster and simpler. Each prime $p$ in the factor base divides $Q(x)$ at precisely two distinct residues modulo $p$. Identifying these residues ($\alpha, \beta$) allows for quickly marking multiples in a linear array, similar to Schroeppel's method but in a more streamlined, one-dimensional manner.
+
+Explicitly, we solve:
+\begin{equation}
+Q(x) \equiv (x + r)^2 - N \equiv 0 \mod p
+\end{equation}
+The solutions $x \equiv \alpha, \beta \mod p$ indicate positions in the sieve array where we add $\log p$.
+
+After completing the sieving, we again compare the logarithmic sum with the magnitude of $Q(x)$, identifying relations by smoothness.
 
 Pomerance greatly improved this phase with three ideas:
 \begin{itemize}
