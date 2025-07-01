@@ -105,8 +105,6 @@ std::vector<int> wiedemann(std::vector<int> A, int n, int max_iteration)
 
         std::vector<int> C = berlekamp_massey(s);
         int d = C.size() - 1;
-        // if (C[d] != 0)
-        //     continue; // Get new (u,v) because f(0) != 0
 
         std::vector<int> q(d+1);
         for (int i = 0; i <= d; i++)
@@ -127,8 +125,8 @@ std::vector<int> wiedemann(std::vector<int> A, int n, int max_iteration)
             continue; // Get new (u,v) because w is one line
         else
         {
-            std::vector<int> r = mat_vect_product_f2(A, w);
-            if (sum_vec(r) == 0)
+            std::vector<int> res = mat_vect_product_f2(A, w);
+            if (sum_vec(res) == 0)
             {
                 std::cout << "WIEDEMANN: found a solution after " << iteration << " iterations." << std::endl;
                 return w;

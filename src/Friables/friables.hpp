@@ -14,6 +14,6 @@
 * - the second vector contains the corresponding X values
 * -------------------------------------
 */
-std::pair<std::vector<unsigned long long>, std::vector<unsigned long long>> QBfriablesV2Long(const unsigned long long N, const size_t A, const std::vector<int> &primes);
+std::pair<std::vector<unsigned long long>, std::vector<unsigned long long>> QBfriablesV2Long(const unsigned long long N, const size_t A, const std::vector<int> &factor_base);
 
 #endif
