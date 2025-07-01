@@ -232,37 +232,72 @@ After processing all primes in the factor base, we compare the accumulated value
 
 This sieve reduces the cost of candidate testing dramatically and laid the groundwork for the first large-scale Quadratic Sieve implementations.
 
-\subsection{Pomerance}
-In 1981, Carl Pomerance introduced the Quadratic Sieve, refining Schroeppel's linear sieve by simplifying the polynomial and significantly optimizing the selection process of candidate smooth numbers.
+\subsection{Pomerance and the Quadratic Sieve}
 
-Pomerance proposed sieving the simpler polynomial:
+Building on Schroeppel's two-dimensional linear sieve, Pomerance proposed a much more practical and efficient method by simplifying the polynomial used and refining the process of detecting $B$-smooth.
+
+At the heart of Pomerance's method is a carefully chosen quadratic polynomial:
 \begin{equation}
-Q(x) = (x + r)^2 - N, \quad \text{where} \quad r = \bigl\lceil\sqrt{N}\bigr\rceil
+Q(x) = (x + r)^2 - N, \quad \text{where} \quad r = \bigl\lceil\sqrt{N}\bigr\rceil.
 \end{equation}
-This single-variable polynomial reduces computational complexity by focusing the sieving on one-dimensional intervals.
+This formulation ensures that $Q(x)$ is close to zero when $x$ is small, making it more likely that $Q(x)$ is $B$-smooth.
 
-The key improvement is in computational efficiency: by using a single-variable polynomial, the process of sieving for smooth numbers became significantly faster and simpler. Each prime $p$ in the factor base divides $Q(x)$ at precisely two distinct residues modulo $p$. Identifying these residues ($\alpha, \beta$) allows for quickly marking multiples in a linear array, similar to Schroeppel's method but in a more streamlined, one-dimensional manner.
+\subsubsection{Roots Modulo $p$ and Residue Classes}
 
-Explicitly, we solve:
+A key insight lies in analyzing the congruence
 \begin{equation}
-Q(x) \equiv (x + r)^2 - N \equiv 0 \mod p
+(x + r)^2 \equiv N \mod p.
 \end{equation}
-The solutions $x \equiv \alpha, \beta \mod p$ indicate positions in the sieve array where we add $\log p$.
+This equation seeks values of $x$ for which $Q(x) \equiv 0 \mod p$. Solving it is equivalent to finding the square roots of $N$ modulo $p$. Specifically, we seek $s \in \mathbb{Z}$ such that:
+\begin{equation}
+s^2 \equiv N \mod p.
+\end{equation}
+If $N$ is a quadratic residue modulo $p$, then there exist exactly two such square roots, say $s$ and $-s \mod p$. Rewriting the original congruence:
+\begin{equation}
+x + r \equiv \pm s \mod p \quad \Longrightarrow \quad
+x \equiv s - r \mod p \quad \text{or} \quad x \equiv -s - r \mod p,
+\end{equation}
+reveals two residue classes $\alpha_p, \beta_p$ for which $p \mid Q(x)$. These positions are used to initialize the sieve for each prime $p$ in the factor base.
 
-After completing the sieving, we again compare the logarithmic sum with the magnitude of $Q(x)$, identifying relations by smoothness.
+\subsubsection{Sieve Centered Around $\sqrt{N}$}
 
-Pomerance greatly improved this phase with three ideas:
+The sieve is centered at $x = 0$, which corresponds to evaluating $Q(x)$ near $r = \lceil \sqrt{N} \rceil$. Around this point, we have the approximation:
+\begin{equation}
+Q(x) = (r + x)^2 - N = r^2 - N + 2rx + x^2 \approx 2rx + x^2.
+\end{equation}
+Since $r \approx \sqrt{N}$, the dominant term is linear in $x$ for small $x$. Thus, $Q(x)$ grows approximately linearly with $x$, meaning that the values of $Q(x)$ increase steadily and predictably as $x$ increases or decreases. This behavior keeps $|Q(x)|$ small in a neighborhood around $x = 0$, significantly increasing the probability that $Q(x)$ will be $B$-smooth.
+
+\subsubsection{Choosing the Factor Base Using the Legendre Symbol}
+
+To ensure efficiency, only those primes $p$ for which $N$ is a quadratic residue modulo $p$ are used in the factor base. This is efficiently tested via the Legendre symbol:
+\begin{equation}
+\Bigl(\tfrac{N}{p}\Bigr) = N^{\frac{p-1}{2}} \bmod p =
+\begin{cases}
+1, & \text{if } N \text{ is a quadratic residue mod } p, \\
+-1, & \text{otherwise}.
+\end{cases}
+\end{equation}
+This ensures that for each $p$ in the factor base, the congruence $(x + r)^2 \equiv N \mod p$ has exactly two solutions, and thus $Q(x)$ can potentially be divisible by $p$.
+
+\subsubsection{Optimal Choice of the Smoothness Bound $B$}
+
+Selecting the bound $B$ is a balancing act: it must be large enough to include enough primes for factoring $Q(x)$ values, but small enough to keep the linear algebra manageable. Pomerance suggested, after a study of the smooth number distribution, the following heuristic bound to minimize total complexity:
+\begin{equation}
+B = e^{\frac{1}{2} \sqrt{\log N \log \log N}}.
+\end{equation}
+
+\subsubsection{Key Improvements Beyond the Basic QS}
+
+Pomerance and later researchers introduced several refinements that significantly improved the performance and practicality of the algorithm:
 \begin{itemize}
-    \item Use the Legendre symbol in a sieve to find such numbers.
-    \item Start the sieve near $\sqrt{N}$ to get small $x$.
-\end{itemize}   
+\item \textbf{Self-initializing sieve:} Rather than hardcoding the positions $\alpha_p, \beta_p$ where each $p$ divides $Q(x)$, this approach dynamically computes them using the modular square roots of $N$ modulo $p$. These positions are then used to mark the sieve efficiently.
+\item \textbf{Large-prime variation:} Instead of requiring $Q(x)$ to be fully $B$-smooth, relations with one or two larger primes in $(B, B^2)$ are accepted. These can be recombined later to form usable full relations, boosting the yield significantly.
+\item \textbf{Multiple-polynomial variant (MPQS):} To extend the method to larger values of $N$, several different polynomials $(ax + b)^2 - N$ are used, each producing smaller $Q(x)$ values and allowing parallelization.
+\item \textbf{Bucket/block sieving:} To reduce memory usage and improve cache efficiency, sieve updates are batched by prime in blocks or "buckets," which avoids touching all sieve positions for each $p$.
+\end{itemize}
 
-Pomerance proposes, based on the prime-number distribution, for a large number $N$, to choose $B$ as:
-\begin{equation}
-    B = e^{\frac{1}{2}  \sqrt{\log N \log \log N}}
-\end{equation}
+Initially, the quadratic sieve employed the Lanczos algorithm for linear algebra computations. However, contemporary implementations typically use Wiedemann's algorithm, which offers linear algebra solutions with complexity $O(n\omega)$, where $\omega$ is the number of nonzero entries.
 
-At the creation of the quadratic sieve algorithm, the kernel was found by the Lanczos' algorithm. But now we use Wiedemann's algorithm, which is a linear algebra algorithm of time complexity $O(n\omega)$, with $\omega$ the number of nonzero coefficients.
 
 \newpage
 
