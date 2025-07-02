@@ -7,6 +7,10 @@
 #include "../Eratosthene/eratosthene.hpp"
 #include "../Tools/tools.hpp"
 
+#ifdef USE_OPENMP
+#include <omp.h>
+#endif
+
 std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> Q_B_friables_128(const __uint128_t N, const size_t A, const std::vector<int> &factor_base)
 {
     const __uint128_t range_start = sqrt_128(N) + 1;
@@ -14,6 +18,9 @@ std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> Q_B_friables_128(c
     Qf.reserve(A); // Reserve space but do not initialize the elements
     X.reserve(A);
 
+#ifdef USE_OPENMP
+#pragma omp parallel for
+#endif
     for (size_t i = 0; i < A; i++)
     {
         Q[i] = (range_start + i) * (range_start + i) - N; // Q(x) = (x + sqrt(N))^2 - N
@@ -40,6 +47,9 @@ std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> Q_B_friables_128(c
             j++;
         }
         const int ecart = a2 - a1;
+#ifdef USE_OPENMP
+#pragma omp parallel for
+#endif
         for (size_t k = a1; k < A - ecart; k += pk) // There is only 2 multiples of pk by interval of pk
         {
             while (Q[k] > 1 && Q[k] % pk == 0)
@@ -52,7 +62,9 @@ std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> Q_B_friables_128(c
             }
         }
     }
-
+#ifdef USE_OPENMP
+#pragma omp parallel for
+#endif
     for (size_t i = 0; i < A; i++)
     {
         if (Q[i] == 1)

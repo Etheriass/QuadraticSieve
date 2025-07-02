@@ -21,6 +21,12 @@ Factorizing large number as been a well-studied problem because many cryptograph
 7. Compute the greatest common divisor of the combinaison and N. Check if it is a non-trivial factor.
 
 
+## OMP
+To activate OMP features, switch ON in the `CMakeLists.txt`:
+```bash
+option(ENABLE_OPENMP "Build with OpenMP support" ON)
+```
+
 ## Build
 
 ```bash

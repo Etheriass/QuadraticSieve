@@ -21,7 +21,7 @@ using Clock = std::chrono::steady_clock; // guaranteed monotonic, not affected b
 int main()
 { //uint128 max value: 340282366920938463463374607431768211455
     auto start = Clock::now();
-    const __uint128_t N = parse_u128("1844674407370955161511111"); // 1844671; 17595551; 184467440737095601; 18446744073709551615
+    const __uint128_t N = parse_u128("34028236692093846346337460743176821145"); // 1844671; 17595551; 184467440737095601; 18446744073709551615
     const int B = (int)exp(0.5 * sqrt(log(N) * log(log(N))));
     print_header(N, B);
 
@@ -45,7 +45,7 @@ int main()
     // Sieving
     auto start_sieving = Clock::now();
     int number_of_relations = 0, iter = 0;
-    size_t A = (size_t)(1000*B*log(B));
+    size_t A = (size_t)(10*B*log(B));
     std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> QfX;
     std::vector<__uint128_t> Qf, X;
     while (number_of_relations <= factor_base_size && iter < 10)

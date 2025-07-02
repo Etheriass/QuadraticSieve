@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <omp.h>
 #include <vector>
 #include <iostream>
 #include "product.hpp"
+
+#ifdef USE_OPENMP
+#include <omp.h>
+#endif
 
 int dot_product(const std::vector<int> &a, const std::vector<int> &b)
 {
@@ -50,6 +53,9 @@ std::vector<int> mat_vect_product_f2(const std::vector<int> &A, const std::vecto
         throw std::invalid_argument("Matrix-vector product: wrong dimensions");
     std::vector<int> res(A.size() / n);
     int r;
+#ifdef USE_OPENMP
+#pragma omp parallel for
+#endif
     for (int i = 0; i < A.size() / n; i++)
     {
         r = 0;
@@ -63,11 +69,15 @@ std::vector<int> mat_vect_product_f2(const std::vector<int> &A, const std::vecto
     return res;
 }
 
-std::vector<int> mat_product_f2(const std::vector<int> &A, const std::vector<int> &B, int n, int m){
+std::vector<int> mat_product_f2(const std::vector<int> &A, const std::vector<int> &B, int n, int m)
+{
     std::vector<int> M(n * n, 0);
 
-        // Product
+    // Product
     int res = 0;
+#ifdef USE_OPENMP
+#pragma omp parallel for
+#endif
     for (int i = 0; i < n; i++)
     {
         for (int j = 0; j < n; j++)
@@ -76,9 +86,9 @@ std::vector<int> mat_product_f2(const std::vector<int> &A, const std::vector<int
             for (int k = 0; k < m; k++)
             {
                 // res += (A[i * m + k] * B[k * n + j]) % 2;
-                res ^= (A[i * m + k] & B[k * n + j]) ;
+                res ^= (A[i * m + k] & B[k * n + j]);
             }
-            M[i * n + j] = res ;
+            M[i * n + j] = res;
         }
     }
     return M;
@@ -110,10 +120,10 @@ std::vector<int> square_mat_product_cpp_parra(std::vector<int> A, std::vector<in
 {
 
     std::vector<int> M(n * n, 0); // Should be faster withou init to 0 but somehow it look faster with it (maybe compiler optimizations)
-    // omp_set_num_threads(10);
+
     // Product
     int res = 0;
-#pragma omp simd
+#pragma omp parallel for
     for (int i = 0; i < n; i++)
     {
         for (int j = 0; j < n; j++)
