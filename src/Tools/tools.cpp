@@ -52,31 +52,37 @@ void print_solution(unsigned long long N, __uint128_t a, __uint128_t b, unsigned
 
 }
 
-void print_timings(s coll, s era, s sieve, s mat, s proc, s kern, s total)
+void print_timings(s coll, s era, s sieve, s mat, s proc, s cons, s kern, s sol, s total)
 {
     auto pct = [&](s phase)
     { return phase.count() / total.count() * 100; };
 
-    std::cout << "\n--- Timings (s) ------------ s -------- % --\n";
-    std::cout << std::fixed << std::setprecision(5);
+    std::cout << "\n--- Timings (s) ------------- s -------- % --\n";
+    std::cout << std::fixed << std::setprecision(4);
     std::cout << std::setw(25) << std::left << "Collection phase"
               << std::setw(8) << coll.count()
-              << std::setw(7) << pct(coll) << "%\n";
+              << std::setw(8) << pct(coll) << "%\n";
     std::cout << "  " << std::setw(23) << "Eratosthenes sieve"
               << std::setw(8) << era.count()
-              << std::setw(7) << pct(era) << "%\n";
+              << std::setw(8) << pct(era) << "%\n";
     std::cout << "  " << std::setw(23) << "Sieving"
               << std::setw(8) << sieve.count()
-              << std::setw(7) << pct(ms(sieve)) << "%\n";
-    std::cout << "  " << std::setw(23) << "Matrix build"
+              << std::setw(8) << pct(ms(sieve)) << "%\n";
+    std::cout << "  " << std::setw(23) << "Matrix filling"
               << std::setw(8) << mat.count()
-              << std::setw(7) << pct(ms(mat)) << "%\n";
+              << std::setw(8) << pct(ms(mat)) << "%\n";
     std::cout << std::setw(25) << "Processing phase"
               << std::setw(8) << proc.count()
-              << std::setw(7) << pct(proc) << "%\n";
+              << std::setw(8) << pct(proc) << "%\n";
+    std::cout << "  " << std::setw(23) << "Matrix construction"
+              << std::setw(8) << cons.count()
+              << std::setw(8) << pct(cons) << "%\n";
     std::cout << "  " << std::setw(23) << "Kernel search"
               << std::setw(8) << kern.count()
-              << std::setw(7) << pct(kern) << "%\n";
+              << std::setw(8) << pct(kern) << "%\n";
+    std::cout << "  " << std::setw(23) << "Solution computation"
+              << std::setw(8) << sol.count()
+              << std::setw(8) << pct(sol) << "%\n";
     std::cout << std::setw(25) << "Total"
               << std::setw(8) << total.count() << "\n\n";
 }
