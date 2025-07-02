@@ -128,11 +128,11 @@ std::vector<int> wiedemann(std::vector<int> A, int n, int max_iteration)
             std::vector<int> res = mat_vect_product_f2(A, w);
             if (sum_vec(res) == 0)
             {
-                std::cout << "WIEDEMANN: found a solution after " << iteration << " iterations." << std::endl;
+                std::cout << "WIEDEMANN: found a solution in " << iteration << " iterations" << std::endl;
                 return w;
             }
         }
     }
-    throw std::runtime_error("WIEDEMANN: failed to find a solution after " + std::to_string(max_iteration) + " iterations.");
+    throw std::runtime_error("WIEDEMANN: failed to find a solution after " + std::to_string(max_iteration) + " iterations");
     return std::vector<int>();
 }

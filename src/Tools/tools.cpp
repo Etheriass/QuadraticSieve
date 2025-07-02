@@ -1,183 +1,82 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
 #include <iostream>
-#include "tools.hpp"
+#include <iomanip>
+#include <chrono>
+#include <vector>
+#include <algorithm>
 
+using ms = std::chrono::duration<double, std::milli>;
+using s = std::chrono::duration<double, std::ratio<1>>;
 
-
-/*
- * Transpose a matrix
- * ------------------
- * A: matrix to transpose
- * T: transposed matrix
- * n: number of rows of A
- * m: number of columns of A
- */
-// void transpose(int *A, int *T, int n, int m)
-// {
-//     int i, j;
-//     for (i = 0; i < n; i++)
-//         for (j = 0; j < m; j++)
-//             T[j * n + i] = A[i * m + j];
-// }
-
-std::vector<int> transpose(std::vector<int> A, int n, int m){
-    std::vector<int> T (n*m, 0);
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < m; j++)
-            T[j * n + i] = A[i * m + j];
-    return T;
-}
-
-void printMatrix(const std::vector<int> &A, int n, int m){
-    for (int i = 0; i<n; i++){
-        for (int j = 0; j < m; j++){
-            std::cout << A[m*i + j] << " ";
-        }
-        std::cout << std::endl;
-    }
-}
-
-/*
- * Print a matrix
- * --------------
- * A: matrix to print
- * n: number of rows of A
- * m: number of columns of A
- */
-void printArrayMatrix(int **A, int n, int m)
+void print_header(unsigned long long N, int B)
 {
-    int i, j;
-    for (i = 0; i < n; i++)
+    std::cout
+        << "=== Quadratic Sieve Factorization ===\n"
+        << " N = " << N << "\n"
+        << " B = " << B << "\n\n";
+}
+
+void print_solution(unsigned long long N, __uint128_t a, __uint128_t b, unsigned long long gcd1, unsigned long long gcd2)
+{
+    auto to_str = [&](auto v)
     {
-        printf("[");
-        for (j = 0; j < m; j++){
-            printf("%d", A[i][j]);
-            if (j < m - 1)
-                printf(" ");
+        if (v == 0)
+            return std::string("0");
+        std::string s;
+        while (v)
+        {
+            s.push_back(char('0' + (v % 10)));
+            v /= 10;
         }
-        printf("]\n");
-    }
-}
+        std::reverse(s.begin(), s.end());
+        return s;
+    };
 
-/*
- * Print square a matrix
- * --------------
- * A: matrix to print
- * n: number of rows and columns of A
- */
-void print_square_matrix(int **A, int n) {
-    int i, j;
-    for (i = 0; i < n; i++) {
-        printf("[");
-        for (j = 0; j < n; j++) {
-            printf("%d", A[i][j]);
-            if (j < n - 1)
-                printf(", ");
-        }
-        printf("]\n");
-    }
-}
+    std::cout << "Solution:\n"
+              << "  a = " << to_str(a) << "\n"
+              << "  b = " << to_str(b) << "\n"
+              << "  gcd(a+b, N) = " << gcd1 << "\n"
+              << "  gcd(b-a, N) = " << gcd2 << "\n\n";
 
-
-/*
- * Allocate Matrix
- * ---------------
- * Allocates memory for a 2D matrix of size rows x cols.
- * - rows: the number of rows in the matrix
- * - cols: the number of columns in the matrix
- */
-int **allocate_matrix(int rows, int cols)
-{
-    int **M = (int **)malloc(rows * sizeof(int *));
-    for (int i = 0; i < rows; i++)
+    std::cout << "Factor found: {" << gcd1 << ", " << gcd2 << "}" << std::endl;
+    if ((gcd1 == 1 && gcd2 == 1) || (gcd1 == 1 && gcd2 == N) || (gcd1 == N && gcd2 == 1) || (gcd1 == N && gcd2 == N))
     {
-        M[i] = (int *)malloc(cols * sizeof(int));
+        std::cout << "FAIL: {" << gcd1 << ", " << gcd2 << "} are trivial factor of " << N << std::endl;
     }
-    return M;
-}
-
-/*
- * Allocate square Matrix
- * ----------------------
- * Allocates memory for a 2D square matrix of size n.
- * - M: a pointer to a pointer to an integer matrix
- * - n: the number of rows and columns in the matrix
- * returns:
- * - the allocated square matrix
- */
-int **allocate_square_matrix(int n, int value)
-{
-    int **M = (int **)malloc(n * sizeof(int *));
-    if (!value){
-        for (int i = 0; i < n; i++){
-            M[i] = (int *)malloc(n * sizeof(int));
-        }
-    } else {
-        for (int i = 0; i < n; ++i) {
-            M[i] = (int*)malloc(n * sizeof(int));
-            for (int j = 0; j < n; ++j) {
-                M[i][j] = value;
-            }
-        }
-    }
-    return M;
-}
-
-
-/*
- * Free Matrix
- * -----------
- * Frees the memory allocated for a 2D matrix.
- * - M: a pointer to an integer matrix
- * - rows: the number of rows in the matrix
- */
-void free_matrix(int **M, int rows)
-{
-    for (int i = 0; i < rows; i++)
+    else
     {
-        free(M[i]);
+        if (N % gcd1 == 0 && gcd1 != 1 && gcd1 != N)
+            std::cout << "SUCCESS: " << gcd1 << " is a non-trivial factor of " << N << std::endl;
+        if (N % gcd2 == 0 && gcd2 != 1 && gcd2 != N)
+            std::cout << "SUCCESS: " << gcd2 << " is a non-trivial factor of " << N << std::endl;
     }
-    free(M);
+
 }
 
-/*
- * Is Matrix Equal
- * ---------------
- * Check if two matrices are equal.
- * - A: a square matrix of size n x n
- * - B: a square matrix of size n x n
- * returns:
- * - 1 if the matrices are equal, 0 otherwise
- */
-
-int is_matrix_equal(int **A, int **B, int n)
+void print_timings(s coll, s era, s sieve, s mat, s proc, s kern, s total)
 {
-    int i, j;
-    for (i = 0; i < n; i++)
-        for (j = 0; j < n; j++)
-            if (A[i][j] != B[i][j])
-                return 0;
-    return 1;
-}
+    auto pct = [&](s phase)
+    { return phase.count() / total.count() * 100; };
 
-/*
- * Is Matrix Equal in Z2
- * ---------------------
- * Check if two matrices are equal in Z/2Z.
- * - A: a square matrix of size n x n
- * - B: a square matrix of size n x n
- * returns:
- * - 1 if the matrices are equal, 0 otherwise
- */
-
-int is_matrix_equal_in_Z2(int **A, int **B, int n)
-{
-    int i, j;
-    for (i = 0; i < n; i++)
-        for (j = 0; j < n; j++)
-            if (A[i][j]%2 != B[i][j]%2)
-                return 0;
-    return 1;
+    std::cout << "\n--- Timings (s) ------------ s -------- % --\n";
+    std::cout << std::fixed << std::setprecision(5);
+    std::cout << std::setw(25) << std::left << "Collection phase"
+              << std::setw(8) << coll.count()
+              << std::setw(7) << pct(coll) << "%\n";
+    std::cout << "  " << std::setw(23) << "Eratosthenes sieve"
+              << std::setw(8) << era.count()
+              << std::setw(7) << pct(era) << "%\n";
+    std::cout << "  " << std::setw(23) << "Sieving"
+              << std::setw(8) << sieve.count()
+              << std::setw(7) << pct(ms(sieve)) << "%\n";
+    std::cout << "  " << std::setw(23) << "Matrix build"
+              << std::setw(8) << mat.count()
+              << std::setw(7) << pct(ms(mat)) << "%\n";
+    std::cout << std::setw(25) << "Processing phase"
+              << std::setw(8) << proc.count()
+              << std::setw(7) << pct(proc) << "%\n";
+    std::cout << "  " << std::setw(23) << "Kernel search"
+              << std::setw(8) << kern.count()
+              << std::setw(7) << pct(kern) << "%\n";
+    std::cout << std::setw(25) << "Total"
+              << std::setw(8) << total.count() << "\n\n";
 }

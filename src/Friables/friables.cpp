@@ -8,7 +8,7 @@
 
 typedef unsigned long long ull;
 
-std::pair<std::vector<ull>, std::vector<ull>> QBfriablesV2Long(const ull N, const size_t A, const std::vector<int> &factor_base)
+std::pair<std::vector<ull>, std::vector<ull>> Q_B_friables_long(const ull N, const size_t A, const std::vector<int> &factor_base)
 {
     const ull range_start = (ull)sqrt(N) + 1;
     std::vector<ull> Q(A), Qf, X;
