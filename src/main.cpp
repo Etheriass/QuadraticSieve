@@ -16,13 +16,12 @@
 #include "Wiedemann/wiedemann.hpp"
 #include "Legendre/legendre.hpp"
 
-typedef unsigned long long ull;
 using Clock = std::chrono::steady_clock; // guaranteed monotonic, not affected by system clock changes
 
 int main()
-{
+{ //uint128 max value: 340282366920938463463374607431768211455
     auto start = Clock::now();
-    constexpr ull N = 18446744073709551615; // 1844671; 17595551; 184467440737095601; 18446744073709551615
+    const __uint128_t N = parse_u128("1844674407370955161511111"); // 1844671; 17595551; 184467440737095601; 18446744073709551615
     const int B = (int)exp(0.5 * sqrt(log(N) * log(log(N))));
     print_header(N, B);
 
@@ -36,7 +35,7 @@ int main()
     // Factor base
     std::vector<int> factor_base;
     for (const int prime: primes){
-        if (legendre_long(N, prime)==1)
+        if (legendre_128(N, prime) == 1)
             factor_base.push_back(prime);
     }
     std::cout << "Factor base reduced from " << primes.size() << " to " << factor_base.size() << " elements" << std::endl;
@@ -46,17 +45,17 @@ int main()
     // Sieving
     auto start_sieving = Clock::now();
     int number_of_relations = 0, iter = 0;
-    size_t A = (size_t)(100*B*log(B));
-    std::pair<std::vector<ull>, std::vector<ull>> QfX;
-    std::vector<ull> Qf, X;
+    size_t A = (size_t)(1000*B*log(B));
+    std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> QfX;
+    std::vector<__uint128_t> Qf, X;
     while (number_of_relations <= factor_base_size && iter < 10)
     {
         std::cout << " Sieve " << iter + 1 << ": interval size = " << A << std::endl;
-        QfX = Q_B_friables_long(N, A, factor_base);
+        QfX = Q_B_friables_128(N, A, factor_base);
         Qf = QfX.first; // Q-B-Friable numbers
         X = QfX.second; // Corresponding X values
         number_of_relations = Qf.size();
-        A *= 10, iter++;
+        A *= 5, iter++;
     }
     auto end_sieving = Clock::now();
     std::chrono::duration<double> dur_sieving = end_sieving - start_sieving;
@@ -112,8 +111,8 @@ int main()
             bb = (bb * factor_base[j]) % N;
     }
 
-    ull gcd1 = (ull)std::gcd((bb + N - aa) % N, N);
-    ull gcd2 = (ull)std::gcd((aa + bb) % N, N);
+    __uint128_t gcd1 = gcd_128((bb + N - aa) % N, N);
+    __uint128_t gcd2 = gcd_128((aa + bb) % N, N);
     print_solution(N, aa, bb, gcd1, gcd2);
     auto end_solution_computation = Clock::now();
     std::chrono::duration<double> dur_solution_computation = end_solution_computation - start_solution_computation;

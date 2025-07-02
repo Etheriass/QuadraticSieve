@@ -1,33 +1,17 @@
 #include <vector>
 #include "factorization.hpp"
 
-std::vector<int> factors_powers(unsigned long long a, const std::vector<int> &primes)
+std::vector<int> factors_powers(__uint128_t a, const std::vector<int> &primes)
 {
     std::vector<int> factors_powers(primes.size(), 0);
     for (size_t i = 0; i < primes.size(); i++)
     {
-        while (a % (unsigned long long)primes[i] == 0)
+        while (a % (__uint128_t)primes[i] == 0)
         {
-            a = a / (unsigned long long)primes[i];
+            a = a / (__uint128_t)primes[i];
             factors_powers[i]++;
         }
     }
     return factors_powers;
 }
 
-std::vector<int> factors_powers_f2(unsigned long long a, const std::vector<int> &primes)
-{
-    std::vector<int> factors_powers(primes.size(), 0);
-    for (size_t i = 0; i < primes.size(); i++)
-    {
-        while (a % (unsigned long long)primes[i] == 0)
-        {
-            a = a / (unsigned long long)primes[i];
-            if (factors_powers[i] == 0)
-                factors_powers[i] = 1;
-            else
-                factors_powers[i] = 0;
-        }
-    }
-    return factors_powers;
-}

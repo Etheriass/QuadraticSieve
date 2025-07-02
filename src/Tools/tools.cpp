@@ -4,53 +4,85 @@
 #include <vector>
 #include <algorithm>
 
-using ms = std::chrono::duration<double, std::milli>;
-using s = std::chrono::duration<double, std::ratio<1>>;
 
-void print_header(unsigned long long N, int B)
+// 128-bit square root using Newton's method
+__uint128_t sqrt_128(__uint128_t n) {
+    if (n == 0) return 0;
+    if (n <= 1) return 1;
+    
+    __uint128_t x = n;
+    __uint128_t y = (x + 1) / 2;
+    
+    while (y < x) {
+        x = y;
+        y = (x + n / x) / 2;
+    }
+    return x;
+}
+
+// 128-bit GCD using the Euclidean algorithm
+__uint128_t gcd_128(__uint128_t a, __uint128_t b) {
+    while (b != 0) {
+        __uint128_t temp = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
+
+__uint128_t parse_u128(const std::string& s) {
+    __uint128_t x = 0;
+    for (char c : s) {
+        x = x * 10 + (c - '0');
+    }
+    return x;
+}
+
+auto to_str = [](__uint128_t v) {
+    if (v == 0) return std::string("0");
+    std::string s;
+    while (v) {
+        s.push_back(char('0' + (v % 10)));
+        v /= 10;
+    }
+    std::reverse(s.begin(), s.end());
+    return s;
+};
+
+
+void print_header(__uint128_t N, int B)
 {
     std::cout
         << "=== Quadratic Sieve Factorization ===\n"
-        << " N = " << N << "\n"
+        << " N = " << to_str(N) << "\n"
         << " B = " << B << "\n\n";
 }
 
-void print_solution(unsigned long long N, __uint128_t a, __uint128_t b, unsigned long long gcd1, unsigned long long gcd2)
+void print_solution(__uint128_t N, __uint128_t a, __uint128_t b, __uint128_t gcd1, __uint128_t gcd2)
 {
-    auto to_str = [&](auto v)
-    {
-        if (v == 0)
-            return std::string("0");
-        std::string s;
-        while (v)
-        {
-            s.push_back(char('0' + (v % 10)));
-            v /= 10;
-        }
-        std::reverse(s.begin(), s.end());
-        return s;
-    };
-
     std::cout << "Solution:\n"
               << "  a = " << to_str(a) << "\n"
               << "  b = " << to_str(b) << "\n"
-              << "  gcd(a+b, N) = " << gcd1 << "\n"
-              << "  gcd(b-a, N) = " << gcd2 << "\n\n";
+              << "  gcd(a+b, N) = " << to_str(gcd1) << "\n"
+              << "  gcd(b-a, N) = " << to_str(gcd2) << "\n\n";
 
-    std::cout << "Factor found: {" << gcd1 << ", " << gcd2 << "}" << std::endl;
+    std::cout << "Factor found: {" << to_str(gcd1) << ", " << to_str(gcd2) << "}" << std::endl;
     if ((gcd1 == 1 && gcd2 == 1) || (gcd1 == 1 && gcd2 == N) || (gcd1 == N && gcd2 == 1) || (gcd1 == N && gcd2 == N))
     {
-        std::cout << "FAIL: {" << gcd1 << ", " << gcd2 << "} are trivial factor of " << N << std::endl;
+        std::cout << "FAIL: {" << to_str(gcd1) << ", " << to_str(gcd2) << "} are trivial factor of " << to_str(N) << std::endl;
     }
     else
     {
         if (N % gcd1 == 0 && gcd1 != 1 && gcd1 != N)
-            std::cout << "SUCCESS: " << gcd1 << " is a non-trivial factor of " << N << std::endl;
+            std::cout << "SUCCESS: " << to_str(gcd1) << " is a non-trivial factor of " << to_str(N) << std::endl;
         if (N % gcd2 == 0 && gcd2 != 1 && gcd2 != N)
-            std::cout << "SUCCESS: " << gcd2 << " is a non-trivial factor of " << N << std::endl;
+            std::cout << "SUCCESS: " << to_str(gcd2) << " is a non-trivial factor of " << to_str(N) << std::endl;
     }
 
 }
+
+using ms = std::chrono::duration<double, std::milli>;
+using s = std::chrono::duration<double, std::ratio<1>>;
 
 void print_timings(s coll, s era, s sieve, s mat, s proc, s cons, s kern, s sol, s total)
 {

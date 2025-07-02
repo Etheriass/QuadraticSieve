@@ -1,6 +1,7 @@
 #ifndef FRIABLES_H
 #define FRIABLES_H
 #include <utility> 
+#include <vector>
 
 /*
 * Sieve of integers B-smooth
@@ -14,6 +15,6 @@
 * - the second vector contains the corresponding X values
 * -------------------------------------
 */
-std::pair<std::vector<unsigned long long>, std::vector<unsigned long long>> Q_B_friables_long(const unsigned long long N, const size_t A, const std::vector<int> &factor_base);
+std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> Q_B_friables_128(const __uint128_t N, const size_t A, const std::vector<int> &factor_base);
 
 #endif

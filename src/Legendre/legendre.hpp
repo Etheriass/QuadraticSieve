@@ -24,6 +24,6 @@ int legendre(int m, int N);
  * - 0 if m is a multiple of N
  * - -1 if m is a non-quadratic residue modulo N
  */
-int legendre_long(unsigned long long int n, int p);
+int legendre_128(__uint128_t n, int p);
 
 #endif

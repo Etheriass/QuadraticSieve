@@ -5,13 +5,12 @@
 #include <utility>
 #include "friables.hpp"
 #include "../Eratosthene/eratosthene.hpp"
+#include "../Tools/tools.hpp"
 
-typedef unsigned long long ull;
-
-std::pair<std::vector<ull>, std::vector<ull>> Q_B_friables_long(const ull N, const size_t A, const std::vector<int> &factor_base)
+std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> Q_B_friables_128(const __uint128_t N, const size_t A, const std::vector<int> &factor_base)
 {
-    const ull range_start = (ull)sqrt(N) + 1;
-    std::vector<ull> Q(A), Qf, X;
+    const __uint128_t range_start = sqrt_128(N) + 1;
+    std::vector<__uint128_t> Q(A), Qf, X;
     Qf.reserve(A); // Reserve space but do not initialize the elements
     X.reserve(A);
 

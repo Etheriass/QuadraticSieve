@@ -41,7 +41,7 @@ int legendre(int m, int N)
         return legendre(N, m);
 }
 
-int legendre_long(unsigned long long int n, int p)
+int legendre_128(__uint128_t n, int p)
 {
     if (p == 0 || (p % 2 == 0 && p != 2))
         throw std::invalid_argument("Legendre symbol: p must be an odd prime number");
@@ -59,13 +59,13 @@ int legendre_long(unsigned long long int n, int p)
     // Cas pair
     if (n % 2 == 0)
         if (p % 8 == 1 || p % 8 == 7)
-            return legendre_long(n / 2, p);
+            return legendre_128(n / 2, p);
         else
-            return -legendre_long(n / 2, p);
+            return -legendre_128(n / 2, p);
     else if (n > p) // Cas impair
-        return legendre_long(n % p, p);
+        return legendre_128(n % p, p);
     else if (n % 4 == 3 && p % 4 == 3)
-        return -legendre_long(p, n);
+        return -legendre_128(p, n);
     else
-        return legendre_long(p, n);
+        return legendre_128(p, n);
 }
