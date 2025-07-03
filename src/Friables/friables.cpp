@@ -30,6 +30,7 @@ std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> Q_B_friables_128(c
     {
         int j = 0;
         int a1 = -1, a2 = -1;
+
         while (j < A) // Find both index where Q[j] == 0 mod pk
         {
             if (Q[j] % pk == 0)
@@ -62,9 +63,9 @@ std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> Q_B_friables_128(c
             }
         }
     }
-#ifdef USE_OPENMP
-#pragma omp parallel for
-#endif
+// #ifdef USE_OPENMP
+// #pragma omp parallel for
+// #endif
     for (size_t i = 0; i < A; i++)
     {
         if (Q[i] == 1)

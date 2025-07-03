@@ -19,9 +19,9 @@
 using Clock = std::chrono::steady_clock; // guaranteed monotonic, not affected by system clock changes
 
 int main()
-{ //uint128 max value: 340282366920938463463374607431768211455
+{ // uint128 max value: 340282366920938463463374607431768211455
     auto start = Clock::now();
-    const __uint128_t N = parse_u128("34028236692093846346337460743176821145"); // 1844671; 17595551; 184467440737095601; 18446744073709551615
+    const __uint128_t N = parse_u128("340282366920938463463374607431768211451"); // 1844671; 17595551; 184467440737095601; 18446744073709551615
     const int B = (int)exp(0.5 * sqrt(log(N) * log(log(N))));
     print_header(N, B);
 
@@ -31,10 +31,11 @@ int main()
     auto end_eratosthene = Clock::now();
     std::chrono::duration<double> dur_eratosthene = end_eratosthene - start_eratosthene;
     std::cout << "Collection phase:\npi(B) = " << primes.size() << std::endl;
-    
+
     // Factor base
     std::vector<int> factor_base;
-    for (const int prime: primes){
+    for (const int prime : primes)
+    {
         if (legendre_128(N, prime) == 1)
             factor_base.push_back(prime);
     }
@@ -45,7 +46,7 @@ int main()
     // Sieving
     auto start_sieving = Clock::now();
     int number_of_relations = 0, iter = 0;
-    size_t A = (size_t)(10*B*log(B));
+    size_t A = (size_t)(100 * B * log(B));
     std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> QfX;
     std::vector<__uint128_t> Qf, X;
     while (number_of_relations <= factor_base_size && iter < 10)
@@ -55,7 +56,7 @@ int main()
         Qf = QfX.first; // Q-B-Friable numbers
         X = QfX.second; // Corresponding X values
         number_of_relations = Qf.size();
-        A *= 5, iter++;
+        A *= 2, iter++;
     }
     auto end_sieving = Clock::now();
     std::chrono::duration<double> dur_sieving = end_sieving - start_sieving;
@@ -86,7 +87,7 @@ int main()
     std::vector<int> MM_T = mat_product_f2(M, M_T, number_of_relations, factor_base_size);
     auto end_matrix_construction = Clock::now();
     std::chrono::duration<double> dur_matrix_construction = end_matrix_construction - start_processing_phase;
-    
+
     // Kernel search using Wiedemann algorithm
     auto start_kernel_search = Clock::now();
     std::vector<int> w = wiedemann(MM_T, number_of_relations, 100);
@@ -98,16 +99,18 @@ int main()
     std::vector<int> exponents(factor_base_size, 0);
     for (int i = 0; i < number_of_relations; i++)
     {
-        if (w[i] == 1){
+        if (w[i] == 1)
+        {
             aa = (aa * X[i]) % N;
-            for(int j = 0; j < factor_base_size; j++)
+            for (int j = 0; j < factor_base_size; j++)
                 exponents[j] += full_exponents[i][j];
         }
     }
 
-    for(int j = 0; j < factor_base_size; j++){
-        int half = exponents[j]/2;
-        while(half--) 
+    for (int j = 0; j < factor_base_size; j++)
+    {
+        int half = exponents[j] / 2;
+        while (half--)
             bb = (bb * factor_base[j]) % N;
     }
 
