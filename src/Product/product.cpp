@@ -76,7 +76,7 @@ std::vector<int> mat_product_f2(const std::vector<int> &A, const std::vector<int
     // Product
     int res = 0;
 #ifdef USE_OPENMP
-#pragma omp parallel for
+#pragma omp parallel for collapse(2) schedule(static)
 #endif
     for (int i = 0; i < n; i++)
     {

@@ -21,7 +21,7 @@ using Clock = std::chrono::steady_clock; // guaranteed monotonic, not affected b
 int main()
 { // uint128 max value: 340282366920938463463374607431768211455
     auto start = Clock::now();
-    const __uint128_t N = parse_u128("340282366920938463463374607431768211451"); // 1844671; 17595551; 184467440737095601; 18446744073709551615
+    const __uint128_t N = parse_u128("340282366920938463463374607431768211451"); // 1844671; 17595551; 18446744073709551615; 340282366920938463463374607431768211451
     const int B = (int)exp(0.5 * sqrt(log(N) * log(log(N))));
     print_header(N, B);
 
@@ -56,11 +56,11 @@ int main()
         Qf = QfX.first; // Q-B-Friable numbers
         X = QfX.second; // Corresponding X values
         number_of_relations = Qf.size();
-        A *= 2, iter++;
+        std::cout << "Found " << number_of_relations << " relations" << std::endl;
+        A *= 3, iter++;
     }
     auto end_sieving = Clock::now();
     std::chrono::duration<double> dur_sieving = end_sieving - start_sieving;
-    std::cout << "Found " << number_of_relations << " relations" << std::endl;
 
     // Mod 2 factors Matrix filling
     auto start_factor_matrix = Clock::now();

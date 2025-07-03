@@ -6,6 +6,7 @@
 #include "friables.hpp"
 #include "../Eratosthene/eratosthene.hpp"
 #include "../Tools/tools.hpp"
+#include "../Legendre/legendre.hpp"
 
 #ifdef USE_OPENMP
 #include <omp.h>
@@ -13,21 +14,21 @@
 
 std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> Q_B_friables_128(const __uint128_t N, const size_t A, const std::vector<int> &factor_base)
 {
-    const __uint128_t range_start = sqrt_128(N) + 1;
-    std::vector<__uint128_t> Q(A), Qf, X;
-    Qf.reserve(A); // Reserve space but do not initialize the elements
-    X.reserve(A);
+    const __uint128_t r = sqrt_128(N) + 1;
+    std::vector<__uint128_t> Q(A);
 
 #ifdef USE_OPENMP
 #pragma omp parallel for
 #endif
     for (size_t i = 0; i < A; i++)
     {
-        Q[i] = (range_start + i) * (range_start + i) - N; // Q(x) = (x + sqrt(N))^2 - N
+        Q[i] = (r + i) * (r + i) - N; // Q(x) = (x + sqrt(N))^2 - N
+        while ((Q[i] & 1) == 0) Q[i] >>= 1; // Remove all factors of 2
     }
 
     for (size_t pk : factor_base)
     {
+        if (pk == 2) continue;
         int j = 0;
         int a1 = -1, a2 = -1;
 
@@ -63,15 +64,18 @@ std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> Q_B_friables_128(c
             }
         }
     }
-// #ifdef USE_OPENMP
-// #pragma omp parallel for
-// #endif
+
+    std::vector<__uint128_t> Qf; // Q-B-Friable numbers
+    std::vector<__uint128_t> X;  // Corresponding X values
+    Qf.reserve(A);
+    X.reserve(A);
+
     for (size_t i = 0; i < A; i++)
     {
         if (Q[i] == 1)
         {
-            Qf.push_back((range_start + i) * (range_start + i) - N);
-            X.push_back((range_start + i));
+            Qf.push_back((r + i) * (r + i) - N);
+            X.push_back((r + i));
         }
     }
     return {Qf, X};

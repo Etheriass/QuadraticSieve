@@ -12,7 +12,7 @@
 * m: number of columns of A
 */
 // void transpose(int *A, int *T, int n, int m);
-std::vector<int> transpose(std::vector<int> A, int n, int m);
+std::vector<int> transpose(const std::vector<int> &A, int n, int m);
 
 void print_matrix(const std::vector<int> &A, int n, int m);
 

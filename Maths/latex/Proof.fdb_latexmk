@@ -1,18 +1,20 @@
 # Fdb version 4
-["bibtex Proof"] 0 "Proof.aux" "Proof.bbl" "Proof" 1751384511.05191 -1
+["bibtex Proof"] 1751557034.49293 "Proof.aux" "Proof.bbl" "Proof" 1751557236.16023 0
   "./biblio.bib" 1750287799.86215 349 f64fc76896aa9103132db17467a1c8ec ""
   "/usr/share/texlive/texmf-dist/bibtex/bst/base/plain.bst" 1292289607 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "Proof.aux" 1751384511.00066 3516 5c4a5a58ce7ab7ff79a4f85786a9080a "pdflatex"
+  "Proof.aux" 1751557236.10745 3624 d22d92e89ec11a2dbf2c753520c640ad "pdflatex"
   (generated)
   "Proof.bbl"
   "Proof.blg"
   (rewritten before read)
-["pdflatex"] 1751384510.86638 "/home/alex/project/QuadraticSieve/Maths/latex/Proof.tex" "Proof.pdf" "Proof" 1751384511.05203 0
+["pdflatex"] 1751557235.97851 "/home/alex/project/QuadraticSieve/Maths/latex/Proof.tex" "Proof.pdf" "Proof" 1751557236.16041 0
   "/etc/texmf/web2c/texmf.cnf" 1747345107.85861 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/alex/.texlive2025/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1095.600pk" 1750344106.87688 12644 f0b03dbd7d87149ef9c578f7505cfa20 ""
-  "/home/alex/project/QuadraticSieve/Maths/latex/Proof.tex" 1751384510.70666 30239 42dcfea4cc24d65e5c89c167cfecba03 ""
+  "/home/alex/.texlive2025/texmf-var/fonts/pk/ljfour/jknappen/ec/tctt1095.600pk" 1751556565.92457 10372 32f4499984ff4970e63b18475271252b ""
+  "/home/alex/project/QuadraticSieve/Maths/latex/Proof.tex" 1751557235.8236 32340 4afc7727bf4fd794c63c66fe153e1306 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/tcrm1095.tfm" 1136768653 1536 02c06700a42be0f5a28664c7273f82e7 ""
+  "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/tctt1095.tfm" 1136768653 1536 52374f37d7a013fe5a15c958e7ebe485 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm" 1246382020 988 bdf658c3bfc2d96d3c8b02cfc1c94c20 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex9.tfm" 1246382020 996 a18840b13b499c08ac2de96a99eda4bc ""
@@ -86,10 +88,10 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1741904018 41538 c016915c1d51223b6dbbfe27341748a8 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1747345236 165211 6b08d096f3d0fe5ff6b266061a2b45e0 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1747345241 1958733 4deb191ba344e6acc30e1da6cd69d6f6 ""
-  "Proof.aux" 1751384511.00066 3516 5c4a5a58ce7ab7ff79a4f85786a9080a "pdflatex"
-  "Proof.bbl" 1751382979.35727 234 b69abd4681513726acfaa31aeb6ad567 "bibtex Proof"
-  "Proof.tex" 1751384510.70666 30239 42dcfea4cc24d65e5c89c167cfecba03 ""
-  "Proof.toc" 1751384511.00166 2091 36ddfc3f424e9bf79496f2f023b8dfdf "pdflatex"
+  "Proof.aux" 1751557236.10745 3624 d22d92e89ec11a2dbf2c753520c640ad "pdflatex"
+  "Proof.bbl" 1751557034.50555 234 b69abd4681513726acfaa31aeb6ad567 "bibtex Proof"
+  "Proof.tex" 1751557235.8236 32340 4afc7727bf4fd794c63c66fe153e1306 ""
+  "Proof.toc" 1751557236.10745 2158 a66a5c293380259803950e6b178f8f50 "pdflatex"
   (generated)
   "Proof.aux"
   "Proof.log"
