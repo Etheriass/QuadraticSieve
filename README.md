@@ -33,7 +33,7 @@ option(ENABLE_OPENMP "Build with OpenMP support" ON)
 mkdir -p build
 cd build
 cmake ..
-make
+make -j$(nproc)
 ```
 
 ## Tests

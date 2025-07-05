@@ -73,7 +73,6 @@ std::vector<int> mat_product_f2(const std::vector<int> &A, const std::vector<int
 {
     std::vector<int> M(n * n, 0);
 
-    // Product
     int res = 0;
 #ifdef USE_OPENMP
 #pragma omp parallel for collapse(2) schedule(static)
@@ -94,12 +93,11 @@ std::vector<int> mat_product_f2(const std::vector<int> &A, const std::vector<int
     return M;
 }
 
-std::vector<int> square_mat_product_cpp(std::vector<int> A, std::vector<int> B, int n)
+std::vector<int> square_mat_product_cpp(const std::vector<int> &A, const std::vector<int> &B, const int n)
 {
 
-    std::vector<int> M(n * n, 0); // Should be faster withou init to 0 but somehow it look faster with it (maybe compiler optimizations)
+    std::vector<int> M(n * n);
 
-    // Product
     int res = 0;
     for (int i = 0; i < n; i++)
     {
@@ -116,14 +114,15 @@ std::vector<int> square_mat_product_cpp(std::vector<int> A, std::vector<int> B, 
     return M;
 }
 
-std::vector<int> square_mat_product_cpp_parra(std::vector<int> A, std::vector<int> B, int n)
+std::vector<int> square_mat_product_cpp_parra_omp(const std::vector<int> &A, const std::vector<int> &B, const int n)
 {
 
-    std::vector<int> M(n * n, 0); // Should be faster withou init to 0 but somehow it look faster with it (maybe compiler optimizations)
+    std::vector<int> M(n * n);
 
-    // Product
     int res = 0;
+#ifdef USE_OPENMP
 #pragma omp parallel for
+#endif
     for (int i = 0; i < n; i++)
     {
         for (int j = 0; j < n; j++)
@@ -138,3 +137,77 @@ std::vector<int> square_mat_product_cpp_parra(std::vector<int> A, std::vector<in
     }
     return M;
 }
+
+std::vector<int> square_mat_product_cpp_parra_omp_init(const std::vector<int> &A, const std::vector<int> &B, const int n)
+{
+
+    std::vector<int> M(n * n, 0);
+
+    int res = 0;
+#ifdef USE_OPENMP
+#pragma omp parallel for
+#endif
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            res = 0;
+            for (int k = 0; k < n; k++)
+            {
+                res += A[i * n + k] * B[k * n + j];
+            }
+            M[i * n + j] = res;
+        }
+    }
+    return M;
+}
+
+std::vector<int> square_mat_product_cpp_parra_omp_collapse(const std::vector<int> &A, const std::vector<int> &B, const int n)
+{
+
+    std::vector<int> M(n * n);
+
+    int res = 0;
+#ifdef USE_OPENMP
+#pragma omp parallel for collapse(2) schedule(static)
+#endif
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            res = 0;
+            for (int k = 0; k < n; k++)
+            {
+                res += A[i * n + k] * B[k * n + j];
+            }
+            M[i * n + j] = res;
+        }
+    }
+    return M;
+}
+
+std::vector<int> square_mat_product_cpp_parra_omp_pthread(const std::vector<int> &A, const std::vector<int> &B, const int n)
+{
+
+    std::vector<int> M(n * n);
+
+    int res = 0;
+
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            res = 0;
+            for (int k = 0; k < n; k++)
+            {
+                res += A[i * n + k] * B[k * n + j];
+            }
+            M[i * n + j] = res;
+        }
+    }
+    return M;
+}
+
+
+
+

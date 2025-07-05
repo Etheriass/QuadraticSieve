@@ -9,20 +9,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_subdirectory(src)
 
 
-# OMP option
-option(ENABLE_OPENMP "Build with OpenMP support" ON)
-
-if(ENABLE_OPENMP)
-  find_package(OpenMP REQUIRED)
-
-  if(OpenMP_CXX_FOUND)
-    # link your executable (or library) against the OpenMP target:
-    target_link_libraries(qs_lib PRIVATE OpenMP::OpenMP_CXX)
-    # Define a compile-time macro so you can #ifdef your code
-    target_compile_definitions(qs_lib PRIVATE USE_OPENMP)
-  endif()
-endif()
-
 # --------------------------
 # Dependency management
 # --------------------------
@@ -57,3 +43,61 @@ enable_testing()
 # Add test and benchmark code
 add_subdirectory(test)
 add_subdirectory(benchmark)
+
+
+# OMP option
+option(ENABLE_OPENMP "Build with OpenMP support" ON)
+
+if(ENABLE_OPENMP)
+  find_package(OpenMP REQUIRED)
+
+  if(OpenMP_CXX_FOUND)
+    message(STATUS "OpenMP found")
+    # link executable against the OpenMP target:
+    target_link_libraries(qs_lib PUBLIC OpenMP::OpenMP_CXX)
+    # Define a compile-time macro so #ifdef
+    target_compile_definitions(qs_lib PUBLIC USE_OPENMP)
+    target_compile_definitions(benchmark PUBLIC USE_OPENMP)
+  else()
+    message(WARNING "OpenMP not found")
+  endif()
+endif()
+    
+# Pthread option
+option(ENABLE_PTHREAD "Build with Pthread support" ON)
+    
+if(ENABLE_PTHREAD)
+  find_package(Threads REQUIRED)
+  if(Threads_FOUND)
+    message(STATUS "PThread found")
+    target_link_libraries(qs_lib PUBLIC Threads::Threads)
+    target_compile_definitions(qs_lib PUBLIC USE_PTHREAD)
+    target_compile_definitions(benchmark PUBLIC USE_PTHREAD)
+  else()
+    message(WARNING "PThread not found")
+  endif()
+endif()
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  add_compile_options(
+    -march=native        # Use the native architecture (current CPU)
+    -funroll-loops       # Unroll loops
+    -O3                  # Optimize for speed
+    -Ofast -ffast-math   # Aggressive optimizations
+    -flto                # Link Time Optimization
+    -fstrict-aliasing    # Enable strict aliasing (assumes pointers of different types do not alias)
+    -fomit-frame-pointer # Omit frame pointers
+    -falign-functions=32 # Align functions to 32-byte boundaries
+    -fno-exceptions      # Disable exceptions
+    -fno-rtti            # Disable RTTI
+  )
+
+  include(CheckIPOSupported)
+  check_ipo_supported(RESULT IPO_OK OUTPUT IPO_ERR)
+  if (IPO_OK)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+  endif()
+
+  # for linking with LTO
+  add_link_options(-flto)
+endif()
