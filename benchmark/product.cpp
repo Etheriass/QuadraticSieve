@@ -10,6 +10,13 @@
 #include <thread>
 #endif
 
+#define ARGS        \
+    ->Arg(512)      \
+        ->Arg(1024) \
+        ->Arg(2048) \
+        ->Iterations(3) // ->Arg(2400)  \
+    // ->UseRealTime()
+
 // Helper to generate a random square matrix as a flat vector
 std::vector<int> random_square_matrix(int n)
 {
@@ -40,34 +47,67 @@ static void BM_matrix_product_template(benchmark::State &state, Func func)
 BENCHMARK_CAPTURE(BM_matrix_product_template, square_mat_product_cpp,
                   [](const std::vector<int> &A, const std::vector<int> &B, int n)
                   {
-                      return square_mat_product_cpp(A, B, n);
+                      return square_mat_product(A, B, n);
                   })
     ->Arg(1024);
 
 #ifdef USE_OPENMP
-BENCHMARK_CAPTURE(BM_matrix_product_template, square_mat_product_cpp_parra_omp,
+BENCHMARK_CAPTURE(BM_matrix_product_template, square_mat_product_omp,
                   [](const std::vector<int> &A, const std::vector<int> &B, int n)
                   {
-                      return square_mat_product_cpp_parra_omp(A, B, n);
+                      return square_mat_product_omp(A, B, n);
                   })
-    ->Arg(1024)
-    ->Arg(1600);
+ARGS;
 
-BENCHMARK_CAPTURE(BM_matrix_product_template, square_mat_product_cpp_parra_omp_init,
+BENCHMARK_CAPTURE(BM_matrix_product_template, square_mat_product_omp_init,
                   [](const std::vector<int> &A, const std::vector<int> &B, int n)
                   {
-                      return square_mat_product_cpp_parra_omp_init(A, B, n);
+                      return square_mat_product_omp_init(A, B, n);
                   })
-    ->Arg(1024)
-    ->Arg(1600);
+ARGS;
 
-BENCHMARK_CAPTURE(BM_matrix_product_template, square_mat_product_cpp_parra_omp_collapse,
+BENCHMARK_CAPTURE(BM_matrix_product_template, square_mat_product_omp_collapse,
                   [](const std::vector<int> &A, const std::vector<int> &B, int n)
                   {
-                      return square_mat_product_cpp_parra_omp_collapse(A, B, n);
+                      return square_mat_product_omp_collapse(A, B, n);
                   })
-    ->Arg(1024)
-    ->Arg(1600);
+ARGS;
+
+BENCHMARK_CAPTURE(BM_matrix_product_template, square_mat_product_omp_init_collapse,
+                  [](const std::vector<int> &A, const std::vector<int> &B, int n)
+                  {
+                      return square_mat_product_omp_init_collapse(A, B, n);
+                  })
+ARGS;
+
+BENCHMARK_CAPTURE(BM_matrix_product_template, square_mat_product_omp_simd,
+                  [](const std::vector<int> &A, const std::vector<int> &B, int n)
+                  {
+                      return square_mat_product_omp_simd(A, B, n);
+                  })
+ARGS;
+
+BENCHMARK_CAPTURE(BM_matrix_product_template, square_mat_product_omp_reorder,
+                  [](const std::vector<int> &A, const std::vector<int> &B, int n)
+                  {
+                      return square_mat_product_omp_reorder(A, B, n);
+                  })
+ARGS;
+
+BENCHMARK_CAPTURE(BM_matrix_product_template, square_mat_product_omp_reorder_init,
+                  [](const std::vector<int> &A, const std::vector<int> &B, int n)
+                  {
+                      return square_mat_product_omp_reorder_init(A, B, n);
+                  })
+ARGS;
+
+BENCHMARK_CAPTURE(BM_matrix_product_template, square_mat_product_omp_reorder_simd,
+                  [](const std::vector<int> &A, const std::vector<int> &B, int n)
+                  {
+                      return square_mat_product_omp_reorder_simd(A, B, n);
+                  })
+ARGS;
+
 #endif
 
 #ifdef USE_PTHREAD
@@ -76,16 +116,21 @@ BENCHMARK_CAPTURE(BM_matrix_product_template, square_mat_product_pthread,
                   {
                       return square_mat_product_pthread(A, B, n, std::thread::hardware_concurrency());
                   })
-    ->Arg(1024)
-    ->Arg(1600);
+ARGS;
 
 BENCHMARK_CAPTURE(BM_matrix_product_template, square_mat_product_pthread_affinity,
                   [](const std::vector<int> &A, const std::vector<int> &B, int n)
                   {
-                      return square_mat_product_pthread_affinity(A, B, n, std::thread::hardware_concurrency());
+                      return square_mat_product_pthread_affinity(A, B, n);
                   })
-    ->Arg(1024)
-    ->Arg(1600);
+ARGS;
+
+BENCHMARK_CAPTURE(BM_matrix_product_template, square_mat_product_pthread_affinity_hyperthread,
+                  [](const std::vector<int> &A, const std::vector<int> &B, int n)
+                  {
+                      return square_mat_product_pthread_affinity_hyperthread(A, B, n, std::thread::hardware_concurrency());
+                  })
+ARGS;
 #endif
 
 BENCHMARK_MAIN();

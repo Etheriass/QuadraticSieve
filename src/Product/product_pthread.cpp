@@ -1,10 +1,9 @@
 #include <iostream>
 #include <vector>
 #include <pthread.h>
-#include <cstdlib>      // posix_memalign
-#include <unistd.h>     // sysconf
+#include <cstdlib>  // posix_memalign
+#include <unistd.h> // sysconf
 #include "product_pthread.hpp"
-
 
 // Struct to hold each thread's arguments
 struct ThreadArgs
@@ -75,37 +74,44 @@ std::vector<int> square_mat_product_pthread(const std::vector<int> &A, const std
 // Aligned version to avoid false sharing
 // This version uses posix_memalign to ensure 64-byte alignment of buffers
 
-struct ThreadArgsAligned {
-    const int* A __attribute__((aligned(64)));
-    const int* B __attribute__((aligned(64)));
-    int*       M __attribute__((aligned(64)));
-    int        n;
-    int        row_start, row_end;
+struct ThreadArgsAligned
+{
+    const int *A __attribute__((aligned(64)));
+    const int *B __attribute__((aligned(64)));
+    int *M __attribute__((aligned(64)));
+    int n;
+    int row_start, row_end;
 };
 
-void* matmul_worker_aligned(void* v) {
-    auto* args = static_cast<ThreadArgsAligned*>(v);
-    const int* A = args->A;
-    const int* B = args->B;
-    int*       M = args->M;
-    int        n = args->n;
+void *matmul_worker_aligned(void *v)
+{
+    auto *args = static_cast<ThreadArgsAligned *>(v);
+    const int *A = args->A;
+    const int *B = args->B;
+    int *M = args->M;
+    int n = args->n;
 
-    constexpr int TILE = 64;  // adjust to cache size
+    constexpr int TILE = 64; // adjust to cache size
 
-    for (int i = args->row_start; i < args->row_end; i += TILE) {
+    for (int i = args->row_start; i < args->row_end; i += TILE)
+    {
         int i_max = std::min(i + TILE, args->row_end);
-        for (int j = 0; j < n; j += TILE) {
+        for (int j = 0; j < n; j += TILE)
+        {
             int j_max = std::min(j + TILE, n);
-            for (int ii = i; ii < i_max; ++ii) {
-                for (int jj = j; jj < j_max; ++jj) {
+            for (int ii = i; ii < i_max; ++ii)
+            {
+                for (int jj = j; jj < j_max; ++jj)
+                {
                     int sum = 0;
                     // software prefetch next block of A and B
-                    __builtin_prefetch(&A[ii*n + 0], 0, 1);
-                    __builtin_prefetch(&B[0*n + jj], 0, 1);
-                    for (int k = 0; k < n; ++k) {
-                        sum += A[ii*n + k] * B[k*n + jj];
+                    __builtin_prefetch(&A[ii * n + 0], 0, 1);
+                    __builtin_prefetch(&B[0 * n + jj], 0, 1);
+                    for (int k = 0; k < n; ++k)
+                    {
+                        sum += A[ii * n + k] * B[k * n + jj];
                     }
-                    M[ii*n + jj] = sum;
+                    M[ii * n + jj] = sum;
                 }
             }
         }
@@ -114,52 +120,45 @@ void* matmul_worker_aligned(void* v) {
 }
 
 std::vector<int> square_mat_product_pthread_affinity(
-    const std::vector<int>& A,
-    const std::vector<int>& B,
-    int n,
-    int num_threads)
+    const std::vector<int> &A,
+    const std::vector<int> &B,
+    int n)
 {
-    // --- 2) aligned buffers to avoid false sharing ---
-    // (std::vector itself won't guarantee 64-byte alignment)
+    std::vector<int> physP = {0, 2, 4, 6}; // I7-1260P has 4 P-cores 
+    int num_threads = physP.size(); // 4
+
+    // --- aligned buffers ---
     int *a, *b, *m;
-    if (posix_memalign((void**)&a, 64, sizeof(int)*n*n) != 0 ||
-        posix_memalign((void**)&b, 64, sizeof(int)*n*n) != 0 ||
-        posix_memalign((void**)&m, 64, sizeof(int)*n*n) != 0) {
+    if (posix_memalign((void **)&a, 64, sizeof(int) * n * n) != 0 ||
+        posix_memalign((void **)&b, 64, sizeof(int) * n * n) != 0 ||
+        posix_memalign((void **)&m, 64, sizeof(int) * n * n) != 0)
+    {
         std::cerr << "posix_memalign failed\n";
         std::exit(1);
     }
     std::copy(A.begin(), A.end(), a);
     std::copy(B.begin(), B.end(), b);
 
-    // --- 3) THREAD SETUP ---
-    std::vector<pthread_t>    threads(num_threads);
-    std::vector<ThreadArgsAligned>   args(num_threads);
-    std::vector<pthread_attr_t> attrs(num_threads);
+    // --- thread setup ---
+    std::vector<pthread_t>        threads(num_threads);
+    std::vector<ThreadArgsAligned> args(num_threads);
+    std::vector<pthread_attr_t>    attrs(num_threads);
 
     int rows_per = n / num_threads;
     for (int t = 0; t < num_threads; ++t) {
-        // compute start/end
+        // 1) prepare arguments
         int start = t * rows_per;
-        int end   = (t+1==num_threads ? n : start + rows_per);
+        int end   = (t + 1 == num_threads ? n : start + rows_per);
+        args[t] = ThreadArgsAligned{a, b, m, n, start, end};
 
-        // init thread‐attributes
+        // 2) init & set affinity
         pthread_attr_init(&attrs[t]);
-
-        // set affinity: pin thread t to core (t mod #cores)
         cpu_set_t cpus;
         CPU_ZERO(&cpus);
-        int ncores = sysconf(_SC_NPROCESSORS_ONLN);
-        CPU_SET(t % ncores, &cpus);
-        pthread_attr_setaffinity_np(
-            &attrs[t],
-            sizeof(cpu_set_t),
-            &cpus
-        );
+        CPU_SET(physP[t], &cpus);  // one logical P-thread per worker
+        pthread_attr_setaffinity_np(&attrs[t], sizeof(cpus), &cpus);
 
-        // fill args
-        args[t] = ThreadArgsAligned{ a, b, m, n, start, end };
-
-        // spawn
+        // 3) launch
         int rc = pthread_create(
             &threads[t],
             &attrs[t],
@@ -172,14 +171,85 @@ std::vector<int> square_mat_product_pthread_affinity(
         }
     }
 
-    // join
+    // --- join & cleanup ---
     for (int t = 0; t < num_threads; ++t) {
         pthread_join(threads[t], nullptr);
         pthread_attr_destroy(&attrs[t]);
     }
 
-    // copy out & free
     std::vector<int> M(m, m + n*n);
     free(a); free(b); free(m);
+    return M;
+}
+
+std::vector<int> square_mat_product_pthread_affinity_hyperthread(
+    const std::vector<int> &A,
+    const std::vector<int> &B,
+    int n,
+    int num_threads)
+{
+    // --- 2) aligned buffers to avoid false sharing ---
+    // (std::vector itself won't guarantee 64-byte alignment)
+    int *a, *b, *m;
+    if (posix_memalign((void **)&a, 64, sizeof(int) * n * n) != 0 ||
+        posix_memalign((void **)&b, 64, sizeof(int) * n * n) != 0 ||
+        posix_memalign((void **)&m, 64, sizeof(int) * n * n) != 0)
+    {
+        std::cerr << "posix_memalign failed\n";
+        std::exit(1);
+    }
+    std::copy(A.begin(), A.end(), a);
+    std::copy(B.begin(), B.end(), b);
+
+    // --- 3) THREAD SETUP ---
+    std::vector<pthread_t> threads(num_threads);
+    std::vector<ThreadArgsAligned> args(num_threads);
+    std::vector<pthread_attr_t> attrs(num_threads);
+
+    int rows_per = n / num_threads;
+    for (int t = 0; t < num_threads; ++t)
+    {
+        // compute start/end
+        int start = t * rows_per;
+        int end = (t + 1 == num_threads ? n : start + rows_per);
+
+        // init thread‐attributes
+        pthread_attr_init(&attrs[t]);
+
+        // set affinity: pin thread t to core (t mod #cores)
+        cpu_set_t cpus;
+        CPU_ZERO(&cpus);
+        int ncores = sysconf(_SC_NPROCESSORS_ONLN);
+        CPU_SET(t % ncores, &cpus);
+        pthread_attr_setaffinity_np(&attrs[t], sizeof(cpu_set_t), &cpus);
+
+        // fill args
+        args[t] = ThreadArgsAligned{a, b, m, n, start, end};
+
+        // spawn
+        int rc = pthread_create(
+            &threads[t],
+            &attrs[t],
+            matmul_worker_aligned,
+            &args[t]);
+        if (rc)
+        {
+            std::cerr << "pthread_create failed: " << rc << "\n";
+            std::exit(1);
+        }
+    }
+
+    // join
+    for (int t = 0; t < num_threads; ++t)
+    {
+        pthread_join(threads[t], nullptr);
+        pthread_attr_destroy(&attrs[t]);
+    }
+
+    // copy out & free
+    std::vector<int> M(m, m + n * n);
+    free(a);
+    free(b);
+    free(m);
     return M;
 }

@@ -4,6 +4,7 @@
 #include <vector>
 
 std::vector<int> square_mat_product_pthread(const std::vector<int> &A, const std::vector<int> &B, int n, int num_threads);
-std::vector<int> square_mat_product_pthread_affinity(const std::vector<int> &A, const std::vector<int> &B, int n, int num_threads);
+std::vector<int> square_mat_product_pthread_affinity(const std::vector<int> &A, const std::vector<int> &B, int n);
+std::vector<int> square_mat_product_pthread_affinity_hyperthread(const std::vector<int> &A, const std::vector<int> &B, int n, int num_threads);
 
 #endif

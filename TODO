@@ -1,0 +1,9 @@
+
+
+HPC folder:
+- create it
+- explain the different things tested
+- Focus on reordering Loop-reordering (i–k–j)
+- explain simd AVX2...
+- explain the difference with pthread and the number of threads (hyperthreading or not (P-cores only)) 4 better than 16!
+- look at vtune or perf
