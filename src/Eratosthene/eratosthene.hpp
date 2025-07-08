@@ -1,5 +1,5 @@
-#ifndef ERATOSTHENE_H
-#define ERATOSTHENE_H
+#ifndef ERATOSTHENE_HPP
+#define ERATOSTHENE_HPP
 #include <vector>
 
 /*

@@ -1,5 +1,5 @@
-#ifndef LEGENDRE_H
-#define LEGENDRE_H
+#ifndef LEGENDRE_HPP
+#define LEGENDRE_HPP
 /*
  * Legendre symbol
  * ---------------

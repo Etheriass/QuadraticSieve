@@ -20,29 +20,16 @@ FetchContent_Declare(
   URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
 )
 
-# Google Benchmark
-FetchContent_Declare(
-  googlebenchmark
-  GIT_REPOSITORY https://github.com/google/benchmark.git
-  GIT_TAG main
-)
-
-# Disable Google Benchmark's self-tests
-set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
-set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
-
 
 # Make available
 FetchContent_MakeAvailable(
   googletest
-  googlebenchmark
 )
 
 enable_testing()
 
 # Add test and benchmark code
 add_subdirectory(test)
-add_subdirectory(benchmark)
 
 
 # OMP option
@@ -57,7 +44,6 @@ if(ENABLE_OPENMP)
     target_link_libraries(qs_lib PUBLIC OpenMP::OpenMP_CXX)
     # Define a compile-time macro so #ifdef
     target_compile_definitions(qs_lib PUBLIC USE_OPENMP)
-    target_compile_definitions(benchmark PUBLIC USE_OPENMP)
   else()
     message(WARNING "OpenMP not found")
   endif()
@@ -72,7 +58,6 @@ if(ENABLE_PTHREAD)
     message(STATUS "PThread found")
     target_link_libraries(qs_lib PUBLIC Threads::Threads)
     target_compile_definitions(qs_lib PUBLIC USE_PTHREAD)
-    target_compile_definitions(benchmark PUBLIC USE_PTHREAD)
   else()
     message(WARNING "PThread not found")
   endif()

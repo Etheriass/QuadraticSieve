@@ -1,7 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "eratosthene.hpp"
 #include <vector>
+#include "eratosthene.hpp"
 
 std::vector<int> eratosthene_sieve(const int n)
 {
