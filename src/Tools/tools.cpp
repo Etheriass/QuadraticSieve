@@ -63,6 +63,8 @@ void print_solution(__uint128_t N, __uint128_t a, __uint128_t b, __uint128_t gcd
     std::cout << "Solution:\n"
               << "  a = " << to_str(a) << "\n"
               << "  b = " << to_str(b) << "\n"
+              << "  a + b = " << to_str(a + b) << "\n"
+              << "  b - a = " << to_str(b - a) << "\n"
               << "  gcd(a+b, N) = " << to_str(gcd1) << "\n"
               << "  gcd(b-a, N) = " << to_str(gcd2) << "\n\n";
 

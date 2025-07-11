@@ -18,10 +18,21 @@
 
 using Clock = std::chrono::steady_clock; // guaranteed monotonic, not affected by system clock changes
 
-int main()
+auto to_strm = [](__uint128_t v) {
+    if (v == 0) return std::string("0");
+    std::string s;
+    while (v) {
+        s.push_back(char('0' + (v % 10)));
+        v /= 10;
+    }
+    std::reverse(s.begin(), s.end());
+    return s;
+};
+
+int main()  
 { // uint128 max value: 340282366920938463463374607431768211455
     auto start = Clock::now();
-    const __uint128_t N = parse_u128("340282366920938463463374607431768211451"); // 1844671; 17595551; 18446744073709551615; 340282366920938463463374607431768211451
+    const __uint128_t N = parse_u128("34028236692093846346337460743176821143"); // 1844671; 17595551; 18446744073709551615; 340282366920938463463374607431768211451
     const int B = (int)exp(0.5 * sqrt(log(N) * log(log(N))));
     print_header(N, B);
 
@@ -46,7 +57,7 @@ int main()
     // Sieving
     auto start_sieving = Clock::now();
     int number_of_relations = 0, iter = 0;
-    size_t A = (size_t)(100 * B * log(B));
+    size_t A = (size_t)(1000 * B * log(B));
     std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> QfX;
     std::vector<__uint128_t> Qf, X;
     while (number_of_relations <= factor_base_size && iter < 10)
@@ -57,7 +68,7 @@ int main()
         X = QfX.second; // Corresponding X values
         number_of_relations = Qf.size();
         std::cout << "Found " << number_of_relations << " relations" << std::endl;
-        A *= 3, iter++;
+        A *= 2, iter++;
     }
     auto end_sieving = Clock::now();
     std::chrono::duration<double> dur_sieving = end_sieving - start_sieving;
@@ -91,17 +102,18 @@ int main()
     // Kernel search using Wiedemann algorithm
     auto start_kernel_search = Clock::now();
     std::vector<int> w = wiedemann(MM_T, number_of_relations, 100);
+    std::cout << "Size kernel vector: " << sum_vec(w) << std::endl;
     auto end_kernel_search = Clock::now();
     std::chrono::duration<double> dur_kernel_search = end_kernel_search - start_kernel_search;
 
     auto start_solution_computation = Clock::now();
-    __uint128_t aa = 1, bb = 1;
+    __uint128_t a = 1, b = 1;
     std::vector<int> exponents(factor_base_size, 0);
     for (int i = 0; i < number_of_relations; i++)
     {
         if (w[i] == 1)
         {
-            aa = (aa * X[i]) % N;
+            a = (a * X[i]) % N;
             for (int j = 0; j < factor_base_size; j++)
                 exponents[j] += full_exponents[i][j];
         }
@@ -111,12 +123,12 @@ int main()
     {
         int half = exponents[j] / 2;
         while (half--)
-            bb = (bb * factor_base[j]) % N;
+            b = (b * factor_base[j]) % N;
     }
 
-    __uint128_t gcd1 = gcd_128((bb + N - aa) % N, N);
-    __uint128_t gcd2 = gcd_128((aa + bb) % N, N);
-    print_solution(N, aa, bb, gcd1, gcd2);
+    __uint128_t gcd1 = gcd_128((b - a) % N, N);
+    __uint128_t gcd2 = gcd_128((a + b) % N, N);
+    print_solution(N, a, b, gcd1, gcd2);
     auto end_solution_computation = Clock::now();
     std::chrono::duration<double> dur_solution_computation = end_solution_computation - start_solution_computation;
     std::chrono::duration<double> dur_processing_phase = end_solution_computation - start_processing_phase;

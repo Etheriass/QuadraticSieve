@@ -28,7 +28,7 @@ FetchContent_MakeAvailable(
 
 enable_testing()
 
-# Add test and benchmark code
+# Add test code
 add_subdirectory(test)
 
 
