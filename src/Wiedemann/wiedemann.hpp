@@ -3,6 +3,6 @@
 
 #include <vector>
 
-std::vector<int> wiedemann(std::vector<int> A, int n, int max_iteration);
+std::vector<char> wiedemann(std::vector<char> A, int n, int max_iteration);
 
 #endif

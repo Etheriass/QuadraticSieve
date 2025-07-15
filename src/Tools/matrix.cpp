@@ -14,9 +14,9 @@
  * m: number of columns of A
  */
 
-std::vector<int> transpose(const std::vector<int> &A, int n, int m)
+std::vector<char> transpose(const std::vector<char> &A, int n, int m)
 {
-    std::vector<int> T(n * m, 0);
+    std::vector<char> T(n * m, 0);
 #ifdef USE_OPENMP
 #pragma omp parallel for
 #endif

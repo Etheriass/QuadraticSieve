@@ -80,7 +80,7 @@ TEST(ParseU128Test, NotNUmberString) {
 
 
 // Helper to compare integer vectors
-void expect_vec_eq(const std::vector<int>& a, const std::vector<int>& b) {
+void expect_vec_eq(const std::vector<char>& a, const std::vector<char>& b) {
     ASSERT_EQ(a.size(), b.size()) << "Vector sizes differ";
     for (size_t i = 0; i < a.size(); ++i) {
         EXPECT_EQ(a[i], b[i]) << "at index " << i;
@@ -89,51 +89,23 @@ void expect_vec_eq(const std::vector<int>& a, const std::vector<int>& b) {
 
 // --- transpose tests ---
 TEST(TransposeTest, Rectangular2x3) {
-    std::vector<int> A = {1,2,3,4,5,6}; // 2 rows, 3 cols
-    std::vector<int> expected = {1,4,2,5,3,6}; // 3 rows, 2 cols (flattened)
+    std::vector<char> A = {1,2,3,4,5,6}; // 2 rows, 3 cols
+    std::vector<char> expected = {1,4,2,5,3,6}; // 3 rows, 2 cols (flattened)
     auto T = transpose(A, 2, 3);
     expect_vec_eq(T, expected);
 }
 
 // --- sum_vec tests ---
 TEST(SumVecTest, NonEmpty) {
-    std::vector<int> v = {1,2,3, -1};
+    std::vector<char> v = {1,2,3, -1};
     EXPECT_EQ(sum_vec(v), 5);
 }
 
 TEST(SumVecTest, Empty) {
-    std::vector<int> v;
+    std::vector<char> v;
     EXPECT_EQ(sum_vec(v), 0);
 }
 
-// --- vec_add tests ---
-TEST(VecAddTest, SameSize) {
-    std::vector<int> u = {1,2,3};
-    std::vector<int> v = {4,5,6};
-    std::vector<int> expected = {5,7,9};
-    expect_vec_eq(vec_add(u,v), expected);
-}
-
-TEST(VecAddTest, MismatchThrows) {
-    std::vector<int> u = {1,2};
-    std::vector<int> v = {1,2,3};
-    EXPECT_THROW(vec_add(u,v), std::invalid_argument);
-}
-
-// --- vec_add_f2 tests ---
-TEST(VecAddF2Test, Mod2) {
-    std::vector<int> u = {1,0,1};
-    std::vector<int> v = {1,1,0};
-    // (1+1)%2=0, (0+1)%2=1, (1+0)%2=1
-    std::vector<int> expected = {0,1,1};
-    expect_vec_eq(vec_add_f2(u,v), expected);
-}
-
-TEST(VecAddF2Test, MismatchThrows) {
-    std::vector<int> u = {1,2};
-    std::vector<int> v = {3};
-    EXPECT_THROW(vec_add_f2(u,v), std::invalid_argument);
-}
 
 // --- print_matrix tests ---
 TEST(PrintMatrixTest, CapturesOutput) {

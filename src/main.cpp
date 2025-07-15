@@ -57,14 +57,14 @@ int main()
         X = QfX.second; // Corresponding X values
         number_of_relations = Qf.size();
         std::cout << "Found " << number_of_relations << " relations" << std::endl;
-        A *= 4, iter++;
+        A *= 3, iter++;
     }
     auto end_sieving = Clock::now();
     std::chrono::duration<double> dur_sieving = end_sieving - start_sieving;
 
     // Mod 2 factors Matrix filling
     auto start_factor_matrix = Clock::now();
-    std::vector<int> M(number_of_relations * factor_base_size);
+    std::vector<char> M(number_of_relations * factor_base_size);
     std::vector<std::vector<int>> full_exponents(number_of_relations, std::vector<int>(factor_base_size));
     std::vector<int> powers(factor_base_size);
     for (int i = 0; i < number_of_relations; i++)
@@ -83,14 +83,14 @@ int main()
     // Processing phase
     auto start_processing_phase = Clock::now();
     std::cout << "\nProcessing phase:\n";
-    std::vector<int> M_T = transpose(M, number_of_relations, factor_base_size);
-    std::vector<int> MM_T = mat_product_f2(M, M_T, number_of_relations, factor_base_size);
+    std::vector<char> M_T = transpose(M, number_of_relations, factor_base_size);
+    std::vector<char> MM_T = mat_product_f2(M, M_T, number_of_relations, factor_base_size);
     auto end_matrix_construction = Clock::now();
     std::chrono::duration<double> dur_matrix_construction = end_matrix_construction - start_processing_phase;
 
     // Kernel search using Wiedemann algorithm
     auto start_kernel_search = Clock::now();
-    std::vector<int> w = wiedemann(MM_T, number_of_relations, 100);
+    std::vector<char> w = wiedemann(MM_T, number_of_relations, 100);
     std::cout << "Size kernel vector: " << sum_vec(w) << std::endl;
     auto end_kernel_search = Clock::now();
     std::chrono::duration<double> dur_kernel_search = end_kernel_search - start_kernel_search;
