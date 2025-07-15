@@ -18,21 +18,10 @@
 
 using Clock = std::chrono::steady_clock; // guaranteed monotonic, not affected by system clock changes
 
-auto to_strm = [](__uint128_t v) {
-    if (v == 0) return std::string("0");
-    std::string s;
-    while (v) {
-        s.push_back(char('0' + (v % 10)));
-        v /= 10;
-    }
-    std::reverse(s.begin(), s.end());
-    return s;
-};
-
-int main()  
+int main()
 { // uint128 max value: 340282366920938463463374607431768211455
     auto start = Clock::now();
-    const __uint128_t N = parse_u128("34028236692093846346337460743176821143"); // 1844671; 17595551; 18446744073709551615; 340282366920938463463374607431768211451
+    const __uint128_t N = parse_u128("340282366920938463463374607431768211451"); // 1844671; 17595551; 18446744073709551615; 340282366920938463463374607431768211451
     const int B = (int)exp(0.5 * sqrt(log(N) * log(log(N))));
     print_header(N, B);
 
@@ -60,7 +49,7 @@ int main()
     size_t A = (size_t)(1000 * B * log(B));
     std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> QfX;
     std::vector<__uint128_t> Qf, X;
-    while (number_of_relations <= factor_base_size && iter < 10)
+    while (number_of_relations <= 2*factor_base_size && iter < 10)
     {
         std::cout << " Sieve " << iter + 1 << ": interval size = " << A << std::endl;
         QfX = Q_B_friables_128(N, A, factor_base);
@@ -68,7 +57,7 @@ int main()
         X = QfX.second; // Corresponding X values
         number_of_relations = Qf.size();
         std::cout << "Found " << number_of_relations << " relations" << std::endl;
-        A *= 2, iter++;
+        A *= 4, iter++;
     }
     auto end_sieving = Clock::now();
     std::chrono::duration<double> dur_sieving = end_sieving - start_sieving;
@@ -126,9 +115,12 @@ int main()
             b = (b * factor_base[j]) % N;
     }
 
-    __uint128_t gcd1 = gcd_128((b - a) % N, N);
+    __uint128_t gcd1 = b >= a ? gcd_128((b - a) % N, N) : gcd_128((a - b) % N, N);
     __uint128_t gcd2 = gcd_128((a + b) % N, N);
-    print_solution(N, a, b, gcd1, gcd2);
+    __uint128_t a_p_b = a + b;
+    __uint128_t b_m_a = b - a;
+    __uint128_t a_m_b = a - b;
+    print_solution(N, a, b, a_p_b, a_m_b, b_m_a , gcd1, gcd2);
     auto end_solution_computation = Clock::now();
     std::chrono::duration<double> dur_solution_computation = end_solution_computation - start_solution_computation;
     std::chrono::duration<double> dur_processing_phase = end_solution_computation - start_processing_phase;

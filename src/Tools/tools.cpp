@@ -64,13 +64,14 @@ void print_header(__uint128_t N, int B)
         << " B = " << B << "\n\n";
 }
 
-void print_solution(__uint128_t N, __uint128_t a, __uint128_t b, __uint128_t gcd1, __uint128_t gcd2)
+void print_solution(__uint128_t N, __uint128_t a, __uint128_t b, __uint128_t a_p_b,  __uint128_t a_m_b,  __uint128_t b_m_a, __uint128_t gcd1, __uint128_t gcd2)
 {
     std::cout << "Solution:\n"
               << "  a = " << to_str(a) << "\n"
               << "  b = " << to_str(b) << "\n"
-              << "  a + b = " << to_str(a + b) << "\n"
-              << "  b - a = " << to_str(b - a) << "\n"
+              << "  a + b = " << to_str(a_p_b) << "\n"
+              << "  a - b = " << to_str(a_m_b) << "\n"
+              << "  b - a = " << to_str(b_m_a) << "\n" 
               << "  gcd(a+b, N) = " << to_str(gcd1) << "\n"
               << "  gcd(b-a, N) = " << to_str(gcd2) << "\n\n";
 
