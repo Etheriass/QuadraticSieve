@@ -31,14 +31,20 @@ __uint128_t gcd_128(__uint128_t a, __uint128_t b) {
 }
 
 __uint128_t parse_u128(const std::string& s) {
+    const __uint128_t U128_MAX = std::numeric_limits<__uint128_t>::max();
     __uint128_t x = 0;
     for (char c : s) {
-        x = x * 10 + (c - '0');
+        if (c < '0' || c > '9')
+            throw std::invalid_argument("parse_u128: non-digit character");
+        int digit = c - '0';
+        if (x > (U128_MAX - digit) / 10)
+            throw std::out_of_range("parse_u128: value exceeds 128 bits");
+        x = x * 10 + digit;
     }
     return x;
 }
 
-auto to_str = [](__uint128_t v) {
+std::string to_str(__uint128_t v) {
     if (v == 0) return std::string("0");
     std::string s;
     while (v) {
