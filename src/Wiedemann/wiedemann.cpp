@@ -80,11 +80,11 @@ std::vector<char> berlekamp_massey(std::vector<char> s)
 }
 
 /*
-* Wiedemann algorithm to find a non-trivial solution of Ax = 0.
-* A is a square matrix of size n x n.
-* max_iteration is the maximum number of iterations to perform.
-* Return an optional vector x such that Ax = 0, or std::nullopt if no solution is found.
-*/
+ * Wiedemann algorithm to find a non-trivial solution of Ax = 0.
+ * A is a square matrix of size n x n.
+ * max_iteration is the maximum number of iterations to perform.
+ * Return an optional vector x such that Ax = 0, or std::nullopt if no solution is found.
+ */
 std::vector<char> wiedemann(std::vector<char> A, int n, int max_iteration)
 {
 
@@ -105,7 +105,7 @@ std::vector<char> wiedemann(std::vector<char> A, int n, int max_iteration)
         std::vector<char> C = berlekamp_massey(s);
         int d = C.size() - 1;
 
-        std::vector<int> q(d+1);
+        std::vector<int> q(d + 1);
         for (int i = 0; i <= d; i++)
             q[i] = C[d - i];
 
@@ -127,11 +127,11 @@ std::vector<char> wiedemann(std::vector<char> A, int n, int max_iteration)
             std::vector<char> res = mat_vect_product_f2(A, w);
             if (sum_vec(res) == 0)
             {
-                std::cout << "WIEDEMANN: found a solution in " << iteration << " iterations" << std::endl;
+                std::cout << " WIEDEMANN: found a kernel vector with " << sum_vec(w) << " non-zero element in " << iteration << " iterations" << std::endl;
                 return w;
             }
         }
     }
-    throw std::runtime_error("WIEDEMANN: failed to find a solution after " + std::to_string(max_iteration) + " iterations");
+    throw std::runtime_error(" WIEDEMANN: failed to find a solution after " + std::to_string(max_iteration) + " iterations");
     return std::vector<char>();
 }

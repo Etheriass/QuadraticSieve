@@ -1,3 +1,4 @@
+#include <string>
 #include <iostream>
 #include <iomanip>
 #include <chrono>
@@ -75,21 +76,19 @@ void print_header(__uint128_t N, int B)
 
 bool solution(__uint128_t N, __uint128_t a, __uint128_t b, __uint128_t gcd1, __uint128_t gcd2)
 {
-    std::cout << "Solution:\n"
+    std::cout << " Tentative solution:\n"
               << "  a = " << to_str(a) << "\n"
               << "  b = " << to_str(b) << "\n";
 
-    std::cout << "  a + b = " << to_str(a + b) << std::endl;
-    b >= a ? std::cout << "  b - a = " << to_str(b - a) << "\n"
-                       << "  gcd(b-a, N) = " << to_str(gcd1) << "\n"
-           : std::cout << "  a - b = " << to_str(a - b) << "\n"
-                       << "  gcd(a-b, N) = " << to_str(gcd1) << "\n";
+    b >= a ? std::cout << "  gcd(b-a, N) = " << to_str(gcd1) << "\n"
+           : std::cout << "  gcd(a-b, N) = " << to_str(gcd1) << "\n";
     std::cout << "  gcd(a+b, N) = " << to_str(gcd2) << "\n\n";
 
-    std::cout << "Factor found: {" << to_str(gcd1) << ", " << to_str(gcd2) << "}" << std::endl;
     if ((gcd1 == 1 && gcd2 == 1) || (gcd1 == 1 && gcd2 == N) || (gcd1 == N && gcd2 == 1) || (gcd1 == N && gcd2 == N))
     {
-        std::cout << "FAIL: {" << to_str(gcd1) << ", " << to_str(gcd2) << "} are trivial factor of " << to_str(N) << std::endl;
+        std::cout << " FAIL: {" << to_str(gcd1) << ", " << to_str(gcd2) << "} are trivial factor of " << to_str(N) << std::endl;
+        std::cout << " Looking for another kernel vector\n"
+                  << std::endl;
         return false;
     }
     else if (N % gcd1 == 0 && gcd1 != 1 && gcd1 != N)

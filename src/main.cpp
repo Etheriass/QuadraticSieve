@@ -63,7 +63,7 @@ __uint128_t safe_mod_mul(__uint128_t a, __uint128_t b, __uint128_t mod)
 int main()
 { // uint128 max value: 340282366920938463463374607431768211455
     auto start = Clock::now();
-    const __uint128_t N = parse_u128("340282366920938463463374607431768211451"); // 1844671; 17595551; 18446744073709551615; 340282366920938463463374607431768211451
+    const __uint128_t N = parse_u128("340282366920938463463374607431768211439"); // 1844671; 17595551; 18446744073709551615; 340282366920938463463374607431768211451
     const int B = (int)exp(0.5 * sqrt(log(N) * log(log(N))));
     print_header(N, B);
 
@@ -90,10 +90,9 @@ int main()
     int number_of_relations = 0, iter = 0;
     size_t A = (size_t)(1000 * B * log(B));
     std::vector<__uint128_t> Qf, X;
-    while (number_of_relations <= 1.5 * factor_base_size && iter < 10)
+    while (number_of_relations < 1 * factor_base_size && iter < 10)
     {
         std::cout << " Sieve " << iter + 1 << ": interval size = " << A << std::endl;
-
         std::tie(Qf, X) = Q_B_friables_128(N, A, factor_base);
         number_of_relations = Qf.size();
         std::cout << "Found " << number_of_relations << " relations" << std::endl;
@@ -141,7 +140,6 @@ int main()
         // Kernel search using Wiedemann algorithm
         start_kernel_search = Clock::now();
         std::vector<char> w = wiedemann(MM_T, number_of_relations, 100);
-        std::cout << "Non-zero element in kernel vector: " << sum_vec(w) << std::endl;
         auto end_kernel_search = Clock::now();
         dur_kernel_search = end_kernel_search - start_kernel_search;
 
@@ -171,6 +169,7 @@ int main()
         __uint128_t gcd2 = gcd_128((a + b) % N, N);
         solution_is_found = solution(N, a, b, gcd1, gcd2);
     }
+    // Computation phase timing is wrong
     auto end_solution_computation = Clock::now();
     std::chrono::duration<double> dur_solution_computation = end_solution_computation - start_solution_computation;
     std::chrono::duration<double> dur_processing_phase = end_solution_computation - start_processing_phase;
