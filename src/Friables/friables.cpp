@@ -64,8 +64,6 @@ std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> Q_B_friables_128(c
 
     std::vector<__uint128_t> Qf; // Q-B-Friable numbers
     std::vector<__uint128_t> X;  // Corresponding X values
-    Qf.reserve(A);
-    X.reserve(A);
 
     for (size_t i = 0; i < A; i++)
     {

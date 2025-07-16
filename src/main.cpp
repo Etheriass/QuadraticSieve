@@ -1,11 +1,7 @@
-#include <cstdlib>
-#include <cstdio>
 #include <iostream>
 #include <cmath>
 #include <chrono>
 #include <vector>
-#include <numeric> // For std::gcd
-#include <utility> // For std::pair
 #include "Eratosthene/eratosthene.hpp"
 #include "Friables/friables.hpp"
 #include "Tools/tools.hpp"
@@ -16,7 +12,53 @@
 #include "Wiedemann/wiedemann.hpp"
 #include "Legendre/legendre.hpp"
 
+#ifdef USE_OPENMP
+#include <omp.h>
+#endif
+
 using Clock = std::chrono::steady_clock; // guaranteed monotonic, not affected by system clock changes
+
+__uint128_t slow_mod_mul(__uint128_t a, __uint128_t b, __uint128_t mod)
+{
+    if (a == 0 || b == 0)
+        return 0;
+    a %= mod;
+    b %= mod;
+
+    __uint128_t result = 0;
+    while (b > 0)
+    {
+        if (b & 1)
+        {
+            // Add a to result, handling overflow
+            __uint128_t temp = mod - result;
+            if (a >= temp)
+                result = a - temp;
+            else
+                result += a;
+        }
+
+        // Double a, handling overflow
+        __uint128_t temp = mod - a;
+        if (a >= temp)
+            a = a - temp;
+        else
+            a += a;
+
+        b >>= 1;
+    }
+    return result;
+}
+
+__uint128_t safe_mod_mul(__uint128_t a, __uint128_t b, __uint128_t mod)
+{
+    __uint128_t prod;
+    // GCC/Clang builtin to detect overflow:
+    if (__builtin_mul_overflow(a, b, &prod))
+        return slow_mod_mul(a, b, mod);
+    else
+        return prod % mod;
+}
 
 int main()
 { // uint128 max value: 340282366920938463463374607431768211455
@@ -47,14 +89,12 @@ int main()
     auto start_sieving = Clock::now();
     int number_of_relations = 0, iter = 0;
     size_t A = (size_t)(1000 * B * log(B));
-    std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> QfX;
     std::vector<__uint128_t> Qf, X;
-    while (number_of_relations <= 2*factor_base_size && iter < 10)
+    while (number_of_relations <= 1.5 * factor_base_size && iter < 10)
     {
         std::cout << " Sieve " << iter + 1 << ": interval size = " << A << std::endl;
-        QfX = Q_B_friables_128(N, A, factor_base);
-        Qf = QfX.first; // Q-B-Friable numbers
-        X = QfX.second; // Corresponding X values
+
+        std::tie(Qf, X) = Q_B_friables_128(N, A, factor_base);
         number_of_relations = Qf.size();
         std::cout << "Found " << number_of_relations << " relations" << std::endl;
         A *= 3, iter++;
@@ -70,6 +110,9 @@ int main()
     for (int i = 0; i < number_of_relations; i++)
     {
         powers = factors_powers(Qf[i], factor_base);
+#ifdef USE_OPENMP
+#pragma omp parallel for
+#endif
         for (int j = 0; j < factor_base_size; j++)
         {
             full_exponents[i][j] = powers[j];
@@ -88,39 +131,46 @@ int main()
     auto end_matrix_construction = Clock::now();
     std::chrono::duration<double> dur_matrix_construction = end_matrix_construction - start_processing_phase;
 
-    // Kernel search using Wiedemann algorithm
-    auto start_kernel_search = Clock::now();
-    std::vector<char> w = wiedemann(MM_T, number_of_relations, 100);
-    std::cout << "Size kernel vector: " << sum_vec(w) << std::endl;
-    auto end_kernel_search = Clock::now();
-    std::chrono::duration<double> dur_kernel_search = end_kernel_search - start_kernel_search;
 
-    auto start_solution_computation = Clock::now();
-    __uint128_t a = 1, b = 1;
-    std::vector<int> exponents(factor_base_size, 0);
-    for (int i = 0; i < number_of_relations; i++)
+    std::chrono::_V2::steady_clock::time_point start_kernel_search;
+    std::chrono::_V2::steady_clock::time_point start_solution_computation;
+    std::chrono::duration<double> dur_kernel_search;
+    bool solution_is_found = false;
+    while (!solution_is_found)
     {
-        if (w[i] == 1)
+        // Kernel search using Wiedemann algorithm
+        start_kernel_search = Clock::now();
+        std::vector<char> w = wiedemann(MM_T, number_of_relations, 100);
+        std::cout << "Non-zero element in kernel vector: " << sum_vec(w) << std::endl;
+        auto end_kernel_search = Clock::now();
+        dur_kernel_search = end_kernel_search - start_kernel_search;
+
+        start_solution_computation = Clock::now();
+        __uint128_t a = 1, b = 1;
+        std::vector<int> exponents(factor_base_size, 0);
+        for (int i = 0; i < number_of_relations; i++)
         {
-            a = (a * X[i]) % N;
-            for (int j = 0; j < factor_base_size; j++)
-                exponents[j] += full_exponents[i][j];
+            if (w[i] == 1)
+            {
+                // a = (a * X[i]) % N;
+                a = safe_mod_mul(a, X[i], N);
+                for (int j = 0; j < factor_base_size; j++)
+                    exponents[j] += full_exponents[i][j];
+            }
         }
-    }
 
-    for (int j = 0; j < factor_base_size; j++)
-    {
-        int half = exponents[j] / 2;
-        while (half--)
-            b = (b * factor_base[j]) % N;
-    }
+        for (int j = 0; j < factor_base_size; j++)
+        {
+            int half = exponents[j] / 2;
+            while (half--)
+                b = safe_mod_mul(b, factor_base[j], N);
+            // b = (b * factor_base[j]) % N;
+        }
 
-    __uint128_t gcd1 = b >= a ? gcd_128((b - a) % N, N) : gcd_128((a - b) % N, N);
-    __uint128_t gcd2 = gcd_128((a + b) % N, N);
-    __uint128_t a_p_b = a + b;
-    __uint128_t b_m_a = b - a;
-    __uint128_t a_m_b = a - b;
-    print_solution(N, a, b, a_p_b, a_m_b, b_m_a , gcd1, gcd2);
+        __uint128_t gcd1 = b >= a ? gcd_128((b - a) % N, N) : gcd_128((a - b) % N, N);
+        __uint128_t gcd2 = gcd_128((a + b) % N, N);
+        solution_is_found = solution(N, a, b, gcd1, gcd2);
+    }
     auto end_solution_computation = Clock::now();
     std::chrono::duration<double> dur_solution_computation = end_solution_computation - start_solution_computation;
     std::chrono::duration<double> dur_processing_phase = end_solution_computation - start_processing_phase;

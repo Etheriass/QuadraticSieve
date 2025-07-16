@@ -4,16 +4,19 @@
 #include <vector>
 #include <algorithm>
 
-
 // 128-bit square root using Newton's method
-__uint128_t sqrt_128(__uint128_t n) {
-    if (n == 0) return 0;
-    if (n <= 1) return 1;
-    
+__uint128_t sqrt_128(__uint128_t n)
+{
+    if (n == 0)
+        return 0;
+    if (n <= 1)
+        return 1;
+
     __uint128_t x = n;
     __uint128_t y = (x + 1) / 2;
-    
-    while (y < x) {
+
+    while (y < x)
+    {
         x = y;
         y = (x + n / x) / 2;
     }
@@ -21,8 +24,10 @@ __uint128_t sqrt_128(__uint128_t n) {
 }
 
 // 128-bit GCD using the Euclidean algorithm
-__uint128_t gcd_128(__uint128_t a, __uint128_t b) {
-    while (b != 0) {
+__uint128_t gcd_128(__uint128_t a, __uint128_t b)
+{
+    while (b != 0)
+    {
         __uint128_t temp = b;
         b = a % b;
         a = temp;
@@ -30,10 +35,12 @@ __uint128_t gcd_128(__uint128_t a, __uint128_t b) {
     return a;
 }
 
-__uint128_t parse_u128(const std::string& s) {
+__uint128_t parse_u128(const std::string &s)
+{
     const __uint128_t U128_MAX = std::numeric_limits<__uint128_t>::max();
     __uint128_t x = 0;
-    for (char c : s) {
+    for (char c : s)
+    {
         if (c < '0' || c > '9')
             throw std::invalid_argument("parse_u128: non-digit character");
         int digit = c - '0';
@@ -44,17 +51,19 @@ __uint128_t parse_u128(const std::string& s) {
     return x;
 }
 
-std::string to_str(__uint128_t v) {
-    if (v == 0) return std::string("0");
+std::string to_str(__uint128_t v)
+{
+    if (v == 0)
+        return std::string("0");
     std::string s;
-    while (v) {
+    while (v)
+    {
         s.push_back(char('0' + (v % 10)));
         v /= 10;
     }
     std::reverse(s.begin(), s.end());
     return s;
 };
-
 
 void print_header(__uint128_t N, int B)
 {
@@ -64,30 +73,37 @@ void print_header(__uint128_t N, int B)
         << " B = " << B << "\n\n";
 }
 
-void print_solution(__uint128_t N, __uint128_t a, __uint128_t b, __uint128_t a_p_b,  __uint128_t a_m_b,  __uint128_t b_m_a, __uint128_t gcd1, __uint128_t gcd2)
+bool solution(__uint128_t N, __uint128_t a, __uint128_t b, __uint128_t gcd1, __uint128_t gcd2)
 {
     std::cout << "Solution:\n"
               << "  a = " << to_str(a) << "\n"
-              << "  b = " << to_str(b) << "\n"
-              << "  a + b = " << to_str(a_p_b) << "\n"
-              << "  a - b = " << to_str(a_m_b) << "\n"
-              << "  b - a = " << to_str(b_m_a) << "\n" 
-              << "  gcd(a+b, N) = " << to_str(gcd1) << "\n"
-              << "  gcd(b-a, N) = " << to_str(gcd2) << "\n\n";
+              << "  b = " << to_str(b) << "\n";
+
+    std::cout << "  a + b = " << to_str(a + b) << std::endl;
+    b >= a ? std::cout << "  b - a = " << to_str(b - a) << "\n"
+                       << "  gcd(b-a, N) = " << to_str(gcd1) << "\n"
+           : std::cout << "  a - b = " << to_str(a - b) << "\n"
+                       << "  gcd(a-b, N) = " << to_str(gcd1) << "\n";
+    std::cout << "  gcd(a+b, N) = " << to_str(gcd2) << "\n\n";
 
     std::cout << "Factor found: {" << to_str(gcd1) << ", " << to_str(gcd2) << "}" << std::endl;
     if ((gcd1 == 1 && gcd2 == 1) || (gcd1 == 1 && gcd2 == N) || (gcd1 == N && gcd2 == 1) || (gcd1 == N && gcd2 == N))
     {
         std::cout << "FAIL: {" << to_str(gcd1) << ", " << to_str(gcd2) << "} are trivial factor of " << to_str(N) << std::endl;
+        return false;
+    }
+    else if (N % gcd1 == 0 && gcd1 != 1 && gcd1 != N)
+    {
+        std::cout << "SUCCESS: " << to_str(gcd1) << " is a non-trivial factor of " << to_str(N) << std::endl;
+        return true;
+    }
+    else if (N % gcd2 == 0 && gcd2 != 1 && gcd2 != N)
+    {
+        std::cout << "SUCCESS: " << to_str(gcd2) << " is a non-trivial factor of " << to_str(N) << std::endl;
+        return true;
     }
     else
-    {
-        if (N % gcd1 == 0 && gcd1 != 1 && gcd1 != N)
-            std::cout << "SUCCESS: " << to_str(gcd1) << " is a non-trivial factor of " << to_str(N) << std::endl;
-        if (N % gcd2 == 0 && gcd2 != 1 && gcd2 != N)
-            std::cout << "SUCCESS: " << to_str(gcd2) << " is a non-trivial factor of " << to_str(N) << std::endl;
-    }
-
+        return false;
 }
 
 using ms = std::chrono::duration<double, std::milli>;

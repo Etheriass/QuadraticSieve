@@ -15,7 +15,7 @@ using ms = std::chrono::duration<double, std::milli>;
 using s = std::chrono::duration<double, std::ratio<1>>;
 
 void print_header(__uint128_t N, int B);
-void print_solution(__uint128_t N, __uint128_t a, __uint128_t b, __uint128_t a_p_b,  __uint128_t a_m_b,  __uint128_t b_m_a, __uint128_t gcd1, __uint128_t gcd2);
+bool solution(__uint128_t N, __uint128_t a, __uint128_t b, __uint128_t gcd1, __uint128_t gcd2);
 void print_timings(s coll, s era, s sieve, s mat, s proc, s cons, s kern, s sol, s total);
 
 std::string to_str(__uint128_t v);
