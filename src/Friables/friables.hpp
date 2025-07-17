@@ -15,6 +15,6 @@
 * - the second vector contains the corresponding X values
 * -------------------------------------
 */
-std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> Q_B_friables_128(const __uint128_t N, const size_t A, const std::vector<int> &factor_base);
+std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> Q_B_friables_128(__uint128_t N, size_t A, const std::vector<int> &factor_base);
 
 #endif

@@ -85,7 +85,7 @@ std::vector<char> berlekamp_massey(std::vector<char> s)
  * max_iteration is the maximum number of iterations to perform.
  * Return an optional vector x such that Ax = 0, or std::nullopt if no solution is found.
  */
-std::vector<char> wiedemann(std::vector<char> A, int n, int max_iteration)
+std::vector<char> wiedemann(const std::vector<char> &A, int n, int max_iteration)
 {
 
     std::vector<char> u(n, 0);

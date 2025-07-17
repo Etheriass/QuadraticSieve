@@ -8,6 +8,6 @@
  * n : bound
  * returns: An array of the primes less or equal to n
  */
-std::vector<int> eratosthene_sieve(const int n);
+std::vector<int> eratosthene_sieve(int n);
 
 #endif

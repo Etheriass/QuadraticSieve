@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 #include "../src/Product/product.hpp"
+#include "../src/Wiedemann/wiedemann.hpp"
 
 std::vector<std::vector<char>> krylov_subspace(const std::vector<char>& A,
                                               const std::vector<char>& v,
                                               int d);
 void set_u_v(std::vector<char>& u, std::vector<char>& v);
 std::vector<char> berlekamp_massey(std::vector<char> s);
-std::vector<char> wiedemann(std::vector<char> A, int n, int max_iteration);
 
 // Helper to compare two integer vectors
 void expect_vec_eq(const std::vector<char>& a, const std::vector<char>& b) {

@@ -11,7 +11,6 @@ __uint128_t parse_u128(const std::string& s);
 
 void print_header(__uint128_t N, int B);
 
-using ms = std::chrono::duration<double, std::milli>;
 using s = std::chrono::duration<double, std::ratio<1>>;
 void print_timings(s coll, s era, s sieve, s mat, s proc, s cons, s kern, s sol, s total);
 
