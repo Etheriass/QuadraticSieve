@@ -74,37 +74,6 @@ void print_header(__uint128_t N, int B)
         << " B = " << B << "\n\n";
 }
 
-bool solution(__uint128_t N, __uint128_t a, __uint128_t b, __uint128_t gcd1, __uint128_t gcd2)
-{
-    std::cout << " Tentative solution:\n"
-              << "  a = " << to_str(a) << "\n"
-              << "  b = " << to_str(b) << "\n";
-
-    b >= a ? std::cout << "  gcd(b-a, N) = " << to_str(gcd1) << "\n"
-           : std::cout << "  gcd(a-b, N) = " << to_str(gcd1) << "\n";
-    std::cout << "  gcd(a+b, N) = " << to_str(gcd2) << "\n\n";
-
-    if ((gcd1 == 1 && gcd2 == 1) || (gcd1 == 1 && gcd2 == N) || (gcd1 == N && gcd2 == 1) || (gcd1 == N && gcd2 == N))
-    {
-        std::cout << " FAIL: {" << to_str(gcd1) << ", " << to_str(gcd2) << "} are trivial factor of " << to_str(N) << std::endl;
-        std::cout << " Looking for another kernel vector\n"
-                  << std::endl;
-        return false;
-    }
-    else if (N % gcd1 == 0 && gcd1 != 1 && gcd1 != N)
-    {
-        std::cout << "SUCCESS: " << to_str(gcd1) << " is a non-trivial factor of " << to_str(N) << std::endl;
-        return true;
-    }
-    else if (N % gcd2 == 0 && gcd2 != 1 && gcd2 != N)
-    {
-        std::cout << "SUCCESS: " << to_str(gcd2) << " is a non-trivial factor of " << to_str(N) << std::endl;
-        return true;
-    }
-    else
-        return false;
-}
-
 using ms = std::chrono::duration<double, std::milli>;
 using s = std::chrono::duration<double, std::ratio<1>>;
 

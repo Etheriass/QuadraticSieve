@@ -10,7 +10,6 @@ __uint128_t gcd_128(__uint128_t a, __uint128_t b);
 __uint128_t parse_u128(const std::string& s);
 
 void print_header(__uint128_t N, int B);
-bool solution(__uint128_t N, __uint128_t a, __uint128_t b, __uint128_t gcd1, __uint128_t gcd2);
 
 using ms = std::chrono::duration<double, std::milli>;
 using s = std::chrono::duration<double, std::ratio<1>>;
