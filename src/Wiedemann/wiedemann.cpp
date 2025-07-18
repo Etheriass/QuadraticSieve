@@ -15,7 +15,7 @@ std::vector<std::vector<char>> krylov_subspace(const std::vector<char> &A, const
     K[0] = v;
 
     for (int i = 1; i < d; i++)
-        K[i] = mat_vect_product_f2(A, K[i - 1]);
+        K[i] = mat_vect_product_f2_enhanced(A, K[i - 1]);
     return K;
 }
 

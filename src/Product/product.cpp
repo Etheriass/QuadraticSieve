@@ -42,6 +42,26 @@ std::vector<char> mat_vect_product_f2(const std::vector<char> &A, const std::vec
     return res;
 }
 
+std::vector<char> mat_vect_product_f2_enhanced(const std::vector<char> &A, const std::vector<char> &b)
+{
+    int n = b.size();
+    int rows = A.size() / n;
+    std::vector<char> res(rows);
+
+    #pragma omp parallel for
+    for (int i = 0; i < rows; i++)
+    {
+        char r = 0;
+        for (int j = 0; j < n; j++)
+        {
+            // r += A[i*n + j] * b[j];
+            r ^= (A[i * n + j] & b[j]);
+        }
+        res[i] = r;
+    }
+    return res;
+}
+
 std::vector<char> mat_product_f2(const std::vector<char> &A, const std::vector<char> &B, int n, int m)
 {
     std::vector<char> M(n * n, 0);
@@ -63,5 +83,34 @@ std::vector<char> mat_product_f2(const std::vector<char> &A, const std::vector<c
             M[i * n + j] = res;
         }
     }
+    return M;
+}
+
+std::vector<char> mat_product_f2_reorder(const std::vector<char> &A, const std::vector<char> &B, int n)
+{
+    std::vector<char> M(n * n);
+
+#pragma omp parallel for
+    for (int i = 0; i < n; ++i)
+    {
+        char *Mi = M.data() + i * n;
+        const char *Ai = A.data() + i * n;
+
+        // zero row i
+        for (int j = 0; j < n; ++j)
+            Mi[j] = 0;
+
+        // accumulate in k-outer, j-inner order
+        for (int k = 0; k < n; ++k)
+        {
+            char a = Ai[k];
+            const char *Bk = B.data() + k * n;
+            for (int j = 0; j < n; ++j)
+            {
+                Mi[j] ^= (a & Bk[j]);
+            }
+        }
+    }
+
     return M;
 }

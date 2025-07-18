@@ -44,7 +44,7 @@ __uint128_t safe_mod_mul(__uint128_t a, __uint128_t b, __uint128_t mod)
         return prod % mod;
 }
 
-__uint128_t a_computation(const std::vector<char> &w, const std::vector<__uint128_t> &X, const __uint128_t N)
+__uint128_t a_computation(const std::vector<char> &w, const std::vector<__uint128_t> &X, __uint128_t N)
 {
     __uint128_t a = 1;
     for (int i = 0; i < w.size(); i++)
@@ -56,7 +56,7 @@ __uint128_t a_computation(const std::vector<char> &w, const std::vector<__uint12
     return a;
 }
 
-__uint128_t b_computation(const std::vector<std::vector<int>> &full_exponents, const std::vector<int> &factor_base, const std::vector<char> &w, const __uint128_t N)
+__uint128_t b_computation(const std::vector<std::vector<int>> &full_exponents, const std::vector<int> &factor_base, const std::vector<char> &w, __uint128_t N)
 {
     __uint128_t b = 1;
     std::vector<int> exponents(factor_base.size(), 0);

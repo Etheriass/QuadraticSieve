@@ -13,14 +13,13 @@
 #include "Legendre/legendre.hpp"
 #include "Solution/solution.hpp"
 
-
-using Clock = std::chrono::steady_clock; // guaranteed monotonic, not affected by system clock changes
+using Clock = std::chrono::steady_clock;
 using duration = std::chrono::duration<double>;
 
 int main()
-{ // uint128 max value: 340282366920938463463374607431768211455  5316911983139663487003542222693990401
+{ // uint128 max value: 340282366920938463463374607431768211455  
     auto start = Clock::now();
-    const __uint128_t N = parse_u128("340282366920938463463374607431768211439"); // 1844671; 17595551; 18446744073709551615; 340282366920938463463374607431768211439
+    const __uint128_t N = parse_u128("5316911983139663487003542222693990401"); // 17595551; 18446744073709551615; 5316911983139663487003542222693990401
     const int B = (int)exp(0.5 * sqrt(log(N) * log(log(N))));
     print_header(N, B);
 
@@ -45,15 +44,20 @@ int main()
     // Sieving
     auto start_sieving = Clock::now();
     int number_of_relations = 0, iter = 0;
-    size_t A = (size_t)(2000 * B * log(B));
+    size_t A = (size_t)(10 * B * log(B));
     std::vector<__uint128_t> Qf, X;
-    while (number_of_relations < 1 * factor_base_size && iter < 10)
+    while (number_of_relations < 2 * factor_base_size)
     {
         std::cout << " Sieve " << iter + 1 << ": interval size = " << A << std::endl;
         std::tie(Qf, X) = Q_B_friables_128(N, A, factor_base);
         number_of_relations = Qf.size();
         std::cout << "Found " << number_of_relations << " relations" << std::endl;
-        A *= 3, iter++;
+        A *= 2, iter++;
+        if (iter > 10)
+        {
+            std::cout << "Too many iterations, stopping sieving: choose a larger interval size." << std::endl;
+            return EXIT_FAILURE;
+        }
     }
     auto end_sieving = Clock::now();
     duration dur_sieving = end_sieving - start_sieving;
@@ -80,7 +84,7 @@ int main()
     auto start_processing_phase = Clock::now();
     std::cout << "\nProcessing phase:\n";
     std::vector<char> M_T = transpose(M, number_of_relations, factor_base_size);
-    std::vector<char> MM_T = mat_product_f2(M, M_T, number_of_relations, factor_base_size);
+    std::vector<char> MM_T = mat_product_f2_reorder(M, M_T, number_of_relations);
     auto end_matrix_construction = Clock::now();
     duration dur_matrix_construction = end_matrix_construction - start_processing_phase;
 
