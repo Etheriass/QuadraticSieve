@@ -27,7 +27,7 @@ std::vector<char> mat_vect_product_f2(const std::vector<char> &A, const std::vec
     std::vector<char> res(A.size() / n);
     char r;
 #ifdef USE_OPENMP
-#pragma omp parallel for
+#pragma omp parallel for private(r)
 #endif
     for (int i = 0; i < A.size() / n; i++)
     {
@@ -68,7 +68,7 @@ std::vector<char> mat_product_f2(const std::vector<char> &A, const std::vector<c
 
     char res = 0;
 #ifdef USE_OPENMP
-#pragma omp parallel for
+#pragma omp parallel for private(res)
 #endif
     for (int i = 0; i < n; i++)
     {
@@ -77,8 +77,8 @@ std::vector<char> mat_product_f2(const std::vector<char> &A, const std::vector<c
             res = 0;
             for (int k = 0; k < m; k++)
             {
-                // res += (A[i * m + k] * B[k * n + j]) % 2;
-                res ^= (A[i * m + k] & B[k * n + j]);
+                // res = ( r + A[i * m + k] * B[k * n + j]) % 2;
+                res ^= A[i * m + k] & B[k * n + j];
             }
             M[i * n + j] = res;
         }
