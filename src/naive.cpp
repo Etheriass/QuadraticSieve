@@ -1,7 +1,6 @@
 #include <iostream>
 #include <chrono>
 #include <iomanip>
-#include <omp.h>
 #include "Tools/tools.hpp"
 
 using Clock = std::chrono::steady_clock;
@@ -23,16 +22,13 @@ void print_progress(double progress, double elapsed, double estimated_total) {
     std::cout.flush();
 }
 
-int main(){
+void naive(){
     __uint128_t N = parse_u128("18446744073709551617"); 
     __uint128_t sqrt_N = sqrt_128(N);
     auto start = Clock::now();
     bool found = false;
     const __uint128_t progress_step = sqrt_N / 1000 ? sqrt_N / 1000 : 1; // update every ~0.1%
 
-    #if true
-    #pragma omp parallel for
-    #endif
     for (__uint128_t i = 2; i < sqrt_N; i++){
         double progress = static_cast<double>(i) / static_cast<double>(sqrt_N);
         auto now = Clock::now();

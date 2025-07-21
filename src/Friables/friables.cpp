@@ -9,7 +9,7 @@
 #include <omp.h>
 #endif
 
-std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> Q_B_friables_128(const __uint128_t N, const size_t A, const std::vector<int> &factor_base)
+std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> Q_B_friables_128(__uint128_t N, size_t A, const std::vector<int> &factor_base)
 {
     const __uint128_t r = sqrt_128(N) + 1;
     std::vector<__uint128_t> Q(A);
@@ -20,12 +20,14 @@ std::pair<std::vector<__uint128_t>, std::vector<__uint128_t>> Q_B_friables_128(c
     for (size_t i = 0; i < A; i++)
     {
         Q[i] = (r + i) * (r + i) - N; // Q(x) = (x + sqrt(N))^2 - N
-        while ((Q[i] & 1) == 0) Q[i] >>= 1; // Remove all factors of 2
+        // while ((Q[i] & 1) == 0) Q[i] >>= 1; // Remove all factors of 2
+        Q[i] >>= __builtin_ctzll(Q[i]); // Remove all factors of 2 using count trailing zeros
     }
 
     for (size_t pk : factor_base)
     {
-        if (pk == 2) continue;
+        if (pk == 2)
+            continue;
         int j = 0;
         int a1 = -1, a2 = -1;
 

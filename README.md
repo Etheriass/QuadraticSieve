@@ -36,6 +36,11 @@ cmake ..
 make -j$(nproc)
 ```
 
+## Run
+```bash
+./build/src/qs_main
+```
+
 ## Tests
 
 ```bash

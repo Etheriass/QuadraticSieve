@@ -133,5 +133,5 @@ std::vector<char> wiedemann(const std::vector<char> &A, int n, int max_iteration
         }
     }
     throw std::runtime_error(" WIEDEMANN: failed to find a solution after " + std::to_string(max_iteration) + " iterations");
-    return std::vector<char>();
+    return std::vector<char>(n, 0);
 }

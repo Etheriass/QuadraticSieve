@@ -38,7 +38,7 @@ if(ENABLE_OPENMP)
   find_package(OpenMP REQUIRED)
 
   if(OpenMP_CXX_FOUND)
-    message(STATUS "OpenMP found")
+    message(STATUS "Using OpenMP")
     # link executable against the OpenMP target:
     target_link_libraries(qs_lib PUBLIC OpenMP::OpenMP_CXX)
     # Define a compile-time macro so #ifdef
@@ -48,19 +48,6 @@ if(ENABLE_OPENMP)
   endif()
 endif()
     
-# Pthread option
-option(ENABLE_PTHREAD "Build with Pthread support" ON)
-    
-if(ENABLE_PTHREAD)
-  find_package(Threads REQUIRED)
-  if(Threads_FOUND)
-    message(STATUS "PThread found")
-    target_link_libraries(qs_lib PUBLIC Threads::Threads)
-    target_compile_definitions(qs_lib PUBLIC USE_PTHREAD)
-  else()
-    message(WARNING "PThread not found")
-  endif()
-endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   add_compile_options(
@@ -72,7 +59,6 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     -fstrict-aliasing    # Enable strict aliasing (assumes pointers of different types do not alias)
     -fomit-frame-pointer # Omit frame pointers
     -falign-functions=32 # Align functions to 32-byte boundaries
-    -fno-exceptions      # Disable exceptions
     -fno-rtti            # Disable RTTI
   )
 
