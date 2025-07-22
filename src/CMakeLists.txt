@@ -1,5 +1,5 @@
 # Gather all source files
-file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS *.cpp *.hpp)
+file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp)
 
 # Exclude main.cpp from the library
 list(REMOVE_ITEM SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)

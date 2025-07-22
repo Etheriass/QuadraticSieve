@@ -1,8 +1,7 @@
 enable_testing()
 
 # Recursively collect all of your .cpp tests
-file(GLOB_RECURSE TEST_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/test/*.cpp
-)
+file(GLOB_RECURSE TEST_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/test/*.cpp)
 
 # Print the entire list at configure time:
 message(STATUS "Found test sources:")
@@ -17,7 +16,7 @@ foreach(test_file IN LISTS TEST_SRC)
   # Create one executable per test file
   add_executable(${test_name} ${test_file})
 
-  # Link your library and GTest
+  # Link our library and GTest
   target_link_libraries(${test_name} PRIVATE qs_lib GTest::gtest GTest::gtest_main)
 
   # Register with CTest

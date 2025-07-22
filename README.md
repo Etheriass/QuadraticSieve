@@ -53,7 +53,7 @@ To activate OpenMP features, switch ON in the `CMakeLists.txt`:
 option(ENABLE_OPENMP "Build with OpenMP support" ON)
 ```
 
-If OpenMP is found, you will see "Using OpenMP" in the output of `cmake ..`.
+If OpenMP is found, you will see it in the output of `cmake ..`.
 
 ## Run Instructions
 

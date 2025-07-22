@@ -17,18 +17,13 @@ FetchContent_Declare(
   GIT_TAG main
 )
 
+FetchContent_MakeAvailable(googletest)
 
-# Make available
-FetchContent_MakeAvailable(
-  googletest
-)
 
 # Add source folder first (defines qs_lib and qs_main)
 add_subdirectory(src)
-
 # Add test code
 add_subdirectory(test)
-
 enable_testing()
 
 # OMP option
@@ -38,11 +33,10 @@ if(ENABLE_OPENMP)
   find_package(OpenMP REQUIRED)
 
   if(OpenMP_CXX_FOUND)
-    message(STATUS "Using OpenMP")
     # link executable against the OpenMP target:
-    target_link_libraries(qs_lib PUBLIC OpenMP::OpenMP_CXX)
+    target_link_libraries(qs_lib PRIVATE OpenMP::OpenMP_CXX)
     # Define a compile-time macro so #ifdef
-    target_compile_definitions(qs_lib PUBLIC USE_OPENMP)
+    target_compile_definitions(qs_lib PRIVATE USE_OPENMP)
   else()
     message(WARNING "OpenMP not found")
   endif()
