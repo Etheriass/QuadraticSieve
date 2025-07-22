@@ -1,19 +1,5 @@
 # Quadratic Sieve in C++
 
-## Table of Contents
-
-- [Quadratic Sieve in C++](#quadratic-sieve-in-c)
-  - [Table of Contents](#table-of-contents)
-  - [Introduction](#introduction)
-  - [Project Purpose](#project-purpose)
-  - [Steps Summary](#steps-summary)
-  - [Dependencies](#dependencies)
-  - [Build Instructions](#build-instructions)
-    - [Enabling OpenMP](#enabling-openmp)
-  - [Run Instructions](#run-instructions)
-  - [Testing](#testing)
-  - [Contact](#contact)
-
 ## Introduction
 
 The Quadratic Sieve is an integer factorization algorithm that is used to factorize large integers. It was invented by *Carl Pomerance* in 1981 as an improvement to Schroeppel’s linear sieve. 
