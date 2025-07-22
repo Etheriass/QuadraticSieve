@@ -44,9 +44,9 @@ int main()
     // Sieving
     auto start_sieving = Clock::now();
     int number_of_relations = 0, iter = 0;
-    size_t A = (size_t)(1000 * B * log(B));
+    size_t A = (size_t)(2000 * B * log(B));
     std::vector<__uint128_t> Qf, X;
-    while (number_of_relations < 2 * factor_base_size)
+    while (number_of_relations < 1 * factor_base_size)
     {
         std::cout << " Sieve " << iter + 1 << ": interval size = " << A << std::endl;
         std::tie(Qf, X) = Q_B_friables_128(N, A, factor_base);

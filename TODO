@@ -1,3 +1,29 @@
 
 
 Krylov of A (9496*9496): 60s
+
+
+Debug:
+--- Timings (s) ------------- s -------- % --
+Collection phase         10.4294 57.2946 %
+  Eratosthenes sieve     0.0013  0.0072  %
+  Sieving                10.4048 57.1593 %
+  Matrix filling         0.0227  0.1247  %
+Processing phase         7.7737  42.7052 %
+  Matrix construction    1.2221  6.7134  %
+  Kernel search          6.5440  35.9495 %
+  Solution computation   0.0072  0.0396  %
+Total                    18.2032 
+
+
+Release:
+--- Timings (s) ------------- s -------- % --
+Collection phase         10.6468 96.8070 %
+  Eratosthenes sieve     0.0001  0.0011  %
+  Sieving                10.6343 96.6935 %
+  Matrix filling         0.0121  0.1103  %
+Processing phase         0.3511  3.1927  %
+  Matrix construction    0.0688  0.6255  %
+  Kernel search          0.2803  2.5486  %
+  Solution computation   0.0014  0.0126  %
+Total                    10.9980 
