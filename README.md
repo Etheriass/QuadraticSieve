@@ -120,6 +120,11 @@ To run a specific test (using a regex):
 ctest -V -R wiedemann
 ```
 
+## Possible Improvements
+This project implement a basic version of the Quadratic Sieve algorithm. There are several areas for potential improvements as described in the `maths/Proof.pdf` document:
+- **Large-Prime Variation:** Accept larger prime factors in the factor base to improve the chances of finding relations.
+- **Multiple-polynomial variant (MPQS):** Use multiple polynomials to increase the number of relations found.
+
 ## Contact
 
 If you encounter any errors or have suggestions for improvement, feel free to contact me. Contributions and feedback are always welcome!
