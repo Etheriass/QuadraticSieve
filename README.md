@@ -60,8 +60,50 @@ If OpenMP is found, you will see it in the output of `cmake ..`.
 To run the main program:
 
 ```bash
-./build/src/qs_main
+./build/src/qs_main <input_number>
 ```
+
+**Example:**
+
+```bash
+./build/src/qs_main 340282366920938463463374607431768211439
+```
+
+Output:
+```bash
+=== Quadratic Sieve Factorization ===
+ N = 340282366920938463463374607431768211439
+ B = 21473
+
+Collection phase:
+pi(B) = 2407
+Factor base reduced from 2407 to 1216 elements
+Number of relations to find: 1216
+ Sieve 1: interval size = 428367093
+Found 1713 relations
+
+Processing phase:
+ WIEDEMANN: found a kernel vector with 785 non-zero element in 1 iterations
+ Tentative solution:
+  a = 99669503353599935594445096719843763585
+  b = 339487779049157348578088401868280434633
+  gcd(b-a, N) = 3272519596853078450649244729
+  gcd(a+b, N) = 1
+
+SUCCESS: 3272519596853078450649244729 is a non-trivial factor of 340282366920938463463374607431768211439
+
+--- Timings (s) ------------- s -------- % --
+Collection phase         10.6336 98.4627 %
+  Eratosthenes sieve     0.0001  0.0010  %
+  Sieving                10.6215 98.3505 %
+  Matrix filling         0.0115  0.1067  %
+Processing phase         0.1660  1.5370  %
+  Matrix construction    0.0606  0.5613  %
+  Kernel search          0.1035  0.9586  %
+  Solution computation   0.0015  0.0142  %
+Total                    10.7996 
+```
+
 
 ## Testing
 
