@@ -16,10 +16,12 @@
 using Clock = std::chrono::steady_clock;
 using duration = std::chrono::duration<double>;
 
-int main()
-{ // uint128 max value: 340282366920938463463374607431768211455  
+// uint128 max value: 340282366920938463463374607431768211455
+
+int main(int argc, char* argv[])
+{  
     auto start = Clock::now();
-    const __uint128_t N = parse_u128("340282366920938463463374607431768211439"); // 17595551; 18446744073709551615; 5316911983139663487003542222693990401
+    const __uint128_t N = parse_u128(argc > 1 ? argv[1] : "340282366920938463463374607431768211439"); // 17595551; 18446744073709551615; 5316911983139663487003542222693990401
     const int B = (int)exp(0.5 * sqrt(log(N) * log(log(N))));
     print_header(N, B);
 
@@ -44,19 +46,20 @@ int main()
     // Sieving
     auto start_sieving = Clock::now();
     int number_of_relations = 0, iter = 0;
-    size_t A = (size_t)(2000 * B * log(B));
+    size_t A = (size_t)(10 * B * log(B));
     std::vector<__uint128_t> Qf, X;
-    while (number_of_relations < 1 * factor_base_size)
+    while (number_of_relations <= 2 * factor_base_size && A < 1e8)
     {
         std::cout << " Sieve " << iter + 1 << ": interval size = " << A << std::endl;
         std::tie(Qf, X) = Q_B_friables_128(N, A, factor_base);
         number_of_relations = Qf.size();
         std::cout << "Found " << number_of_relations << " relations" << std::endl;
         A *= 2, iter++;
-        if (iter > 10)
+        if (iter > 20)
         {
             std::cout << "Too many iterations, stopping sieving: choose a larger interval size." << std::endl;
-            return EXIT_FAILURE;
+            break;
+            // return EXIT_FAILURE;
         }
     }
     auto end_sieving = Clock::now();
