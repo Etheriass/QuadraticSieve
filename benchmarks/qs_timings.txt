@@ -1,1 +1,0 @@
-ERROR: Command '['../build/src/qs_main', '99799811']' died with <Signals.SIGABRT: 6>.
