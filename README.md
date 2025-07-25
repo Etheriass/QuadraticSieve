@@ -125,6 +125,8 @@ This project implement a basic version of the Quadratic Sieve algorithm. There a
 - **Large-Prime Variation:** Accept larger prime factors in the factor base to improve the chances of finding relations.
 - **Multiple-polynomial variant (MPQS):** Use multiple polynomials to increase the number of relations found.
 
+Lastly, this project use `__uint128_t` type to handle large integers as it is available in GCC and Clang compilers. To handle even larger integers, consider using libraries like GMP or Boost.Multiprecision.
+
 ## Contact
 
 If you encounter any errors or have suggestions for improvement, feel free to contact me. Contributions and feedback are always welcome!
