@@ -22,7 +22,8 @@
 \contentsline {subsection}{\numberline {3.4}Probability of success}{10}{}%
 \contentsline {subsection}{\numberline {3.5}Complexity of Wiedemann's Algorithm:}{11}{}%
 \contentsline {subsection}{\numberline {3.6}Conclusion}{11}{}%
-\contentsline {section}{\numberline {4}Example}{11}{}%
-\contentsline {section}{\numberline {5}Parallelize sieving}{13}{}%
-\contentsline {section}{\numberline {A}Wiedemann's algorithm pseudo-code}{15}{}%
-\contentsline {section}{\numberline {B}Berlekamp-Massey algorithm pseudo-code}{15}{}%
+\contentsline {section}{\numberline {4}Full example}{12}{}%
+\contentsline {subsection}{\numberline {4.1}Data collection phase: sieving}{12}{}%
+\contentsline {subsection}{\numberline {4.2}Data processing phase:}{12}{}%
+\contentsline {section}{\numberline {A}Wiedemann's algorithm pseudo-code}{14}{}%
+\contentsline {section}{\numberline {B}Berlekamp-Massey algorithm pseudo-code}{14}{}%

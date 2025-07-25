@@ -1,8 +1,39 @@
 \begin{thebibliography}{1}
 
-\bibitem{wiedemann}
-DOUGLAS~H. WIEDEMANN.
-\newblock {Solving Sparse Linear Equations Over Finite Fields}.
-\newblock {\em IEEE Transactions on Information Theory}, 32(1):54--62, 1986.
+\bibitem{Dixon1981}
+John~D. Dixon.
+\newblock Asymptotically fast factorization of integers.
+\newblock {\em Mathematics of Computation}, 36(153):255--260, January 1981.
+
+\bibitem{Kraitchik1929Factorisation}
+Marcel Kraitchik.
+\newblock {\em Recherches sur la théorie des nombres, Tome II: Factorisation}.
+\newblock Gauthier-Villars, Paris, France, 1929.
+
+\bibitem{Legendre1798}
+Adrien-Marie Legendre.
+\newblock {\em Essai sur la théorie des nombres}.
+\newblock Duprat, Paris, France, 1798.
+\newblock Originally published An VI (1798).
+
+\bibitem{Massey1969}
+James~L. Massey.
+\newblock Shift-register synthesis and bch decoding.
+\newblock {\em IEEE Transactions on Information Theory}, 15(1):122--127, January 1969.
+
+\bibitem{Pomerance1985QuadraticSieve}
+Carl Pomerance.
+\newblock The quadratic sieve factoring algorithm.
+\newblock In {\em Advances in Cryptology: Proceedings of EUROCRYPT 84}, volume 209 of {\em Lecture Notes in Computer Science}, pages 169--182. Springer, Berlin, Heidelberg, January 1985.
+
+\bibitem{RSA1978}
+Ronald~L. Rivest, Adi Shamir, and Leonard Adleman.
+\newblock A method for obtaining digital signatures and public-key cryptosystems.
+\newblock {\em Communications of the ACM}, 21(2):120--126, February 1978.
+
+\bibitem{Wiedemann1986}
+Douglas~H. Wiedemann.
+\newblock Solving sparse linear equations over finite fields.
+\newblock {\em IEEE Transactions on Information Theory}, 32(1):54--62, January 1986.
 
 \end{thebibliography}

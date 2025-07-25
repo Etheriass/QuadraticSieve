@@ -10,7 +10,8 @@
 \maketitle
 
 \begin{abstract}
-    This document present the Quadratic Sieve algorithm. First, we explain why we need an involving algorithm to factorize a large number. Then, we walk throught the mathematical basis of the algorithm.
+    This document present the Quadratic Sieve algorithm. First, we explain why we need an involving algorithm to factorize a large number. Then, we walk throught the mathematical basis of the algorithm. 
+    Finally, we present the Wiedemann's algorithm which is used to solve the linear algebra problem in the Quadratic Sieve.
 \end{abstract}
 
 \tableofcontents
@@ -19,7 +20,7 @@
 
 \section{RSA cryptosystem}
 
-RSA is an asymmetric encryption system \textit{(public key for encryption and private key for decryption)}. It was published in 1977 by Ron Rivest, Adi Shamir and Leonard Adleman, from whose surnames the initials R, S and A are derived.
+RSA is an asymmetric encryption system \textit{(public key for encryption and private key for decryption)}. It was published in 1977 \cite{RSA1978} by Ron Rivest, Adi Shamir and Leonard Adleman, from whose surnames the initials R, S and A are derived.
 
 \subsection{Principle}
 The aim of RSA is to build a \textbf{one-way} function, meaning it is easy to compute in one direction but computationally hard to reverse.
@@ -49,7 +50,6 @@ Now, given:
 \begin{itemize}
     \item $n = p \times q$ with $p$ and $q$ distinct prime numbers
     \item $a$ an integer coprime with $n$
-    % \item The Euler's totient $\varphi(n) =\varphi(pq) = pq \times \left(1-\frac{1}{p}\right) \times \left(1-\frac{1}{q}\right) = pq - q - p =(p-1)(q-1)$
     \item $e$ an integer coprime with $\varphi(n)$ 
 \end{itemize}
 
@@ -130,7 +130,7 @@ Thus finding the factorisation $n = p \times q$ is the key to the key.
 
 \section{Quadratic Sieve by Carl Pomerance (1981)}
 
-The Quadratic Sieve is an \textbf{integer factorization algorithm} for large $N$. It was invented by Carl Pomerance in 1981 as an improvement to Schroeppel's linear sieve that builds on the ideas of Dixon and Kraitchik.
+The Quadratic Sieve \cite{Pomerance1985QuadraticSieve} is an \textbf{integer factorization algorithm} for large $N$. It was invented by Carl Pomerance in 1981 as an improvement to Schroeppel's linear sieve that builds on the ideas of Dixon and Kraitchik.
 
 In practice, it is the second fastest algorithm for factorizing integers of more than 100 digits, after the General Number Field Sieve. It is, however, the fastest for integers of less than 100 digits. Given our resources, we will focus on the factorization of integers of less than 100 digits and therefore, the Quadratic Sieve algorithm is relevant.
 
@@ -166,7 +166,7 @@ Thus, $N$ has a non-trivial factor with at least one of $(a-b)$ and $(a+b).$
 
 \subsection{Kraitchik Method}
 
-To find squares $a^2$ and $b^2$ satisfying the necessary congruence conditions, Kraitchik computed values from what we now call the \textbf{Kraitchik polynomial}:
+To find squares $a^2$ and $b^2$ satisfying the necessary congruence conditions, Kraitchik \cite{Kraitchik1929Factorisation} computed values from what we now call the \textbf{Kraitchik polynomial}:
 \begin{equation}
 Q(x_i) = x_i^2 - N
 \end{equation}
@@ -191,7 +191,7 @@ which can then be exploited to factor the integer $N$.
 
 Before discussing Dixon's technique, we define the \textbf{smoothness of a number}. A number is said to be $B$-smooth if all its prime factors are less than or equal to $B$.
 
-Dixon's key improvement was collecting only values $Q(x_i)$ that are $B$-smooth. With a suitably chosen small $B$, identifying combinations of these smooth values becomes significantly easier. We thus define a \textbf{factor base} consisting of all primes less than or equal to $B$ and denote its size by $\pi(B)$. The $B$-smooth values we select are termed \textbf{relations}.
+Dixon's \cite{Dixon1981} key improvement was collecting only values $Q(x_i)$ that are $B$-smooth. With a suitably chosen small $B$, identifying combinations of these smooth values becomes significantly easier. We thus define a \textbf{factor base} consisting of all primes less than or equal to $B$ and denote its size by $\pi(B)$. The $B$-smooth values we select are termed \textbf{relations}.
 
 Next, we construct a matrix $M$ where each row represents the exponent vector of prime factors for each relation $Q(x_i)$. Hence, the matrix $M$ has $\pi(B)$ columns, one for each prime in the factor base.
 
@@ -202,12 +202,14 @@ To identify such combinations, we find the kernel of the transposed matrix $M^T$
 In general, finding the kernel of a matrix can be performed using Gaussian elimination, which has a complexity of $O(n^3)$. However, in this context, the matrix $M$ is typically large and sparse, motivating the use of more efficient methods specialized for sparse linear algebra.
 
 \subsection{Schroeppel's linear sieve}
-In 1977, Schroeppel proposed an important refinement of Dixon's random-sampling approach by replacing it with an efficient sieving process on a two-dimensional polynomial:
+Richard C. Schroeppel's original analysis was never formally published but circulated in personal communications in the mid-1970s.
+
+Schroeppel proposed an important refinement of Dixon's random-sampling approach by replacing it with an efficient sieving process on a two-dimensional polynomial:
 \begin{equation}
 Q(i,j) = (r+i)(r+j) - N, \quad \text{where} \quad r = \bigl\lceil\sqrt{N}\bigr\rceil
 \end{equation}
 
-Sieving in two dimensions offers two main advantages. First, it generates a richer set of candidate values around zero—by varying both $i$ and $j$, one explores a full grid of residues, increasing the density of potential smooth numbers. Second, the 2D layout improves memory locality and allows parallel sieving across rows or columns, yielding practical speedups on modern hardware.
+Sieving in two dimensions offers two main advantages. First, it generates a richer set of candidate values around zero by varying both $i$ and $j$, one explores a full grid of residues, increasing the density of potential smooth numbers. Second, the 2D layout improves memory locality and allows parallel sieving across rows or columns, yielding practical speedups on modern hardware.
 
 To clearly understand Schroeppel's sieve, we first recall the concept of \textbf{residue classes}. In modular arithmetic, the residue class modulo $n$ of an integer $a$ is the set of all integers congruent to $a$ modulo $n$:
 \begin{equation}
@@ -269,7 +271,7 @@ Since $r \approx \sqrt{N}$, the dominant term is linear in $x$ for small $x$. Th
 
 \subsubsection{Choosing the Factor Base Using the Legendre Symbol}
 
-To ensure efficiency, only those primes $p$ for which $N$ is a quadratic residue modulo $p$ are used in the factor base. This is efficiently tested via the Legendre symbol:
+To ensure efficiency, only those primes $p$ for which $N$ is a quadratic residue modulo $p$ are used in the factor base. This is efficiently tested via the Legendre symbol \cite{Legendre1798}:
 \begin{equation}
 \Bigl(\tfrac{N}{p}\Bigr) = N^{\frac{p-1}{2}} \bmod p =
 \begin{cases}
@@ -302,10 +304,9 @@ Initially, the quadratic sieve employed the Lanczos algorithm for linear algebra
 \newpage
 
 \section{Wiedemann's algorithm}
-The \textbf{Wiedemann algorithm} \cite{wiedemann} is a probabilistic iterative, projection-based Krylov-subspace method for solving sparse systems of linear equations over finite fields. 
+The \textbf{Wiedemann algorithm} \cite{Wiedemann1986} is a probabilistic iterative, projection-based Krylov-subspace method for solving sparse systems of linear equations over finite fields. 
 
-It is based on the fact that when a square matrix is repeatedly applied to a
-vector, the sequence of vectors satisfies a linear recurrence.
+It is based on the fact that when a square matrix is repeatedly applied to a vector, the sequence of vectors satisfies a linear recurrence.
 
 Consider a sparse $n \times n$ matrix $A$ and a vector $b$ of size $n$ over a finite field $\mathbb{F}$, the problem is to find a vector $x$ such that:
 \begin{equation}
@@ -365,8 +366,6 @@ The idea of Wiedemann is to do a \textbf{scalar projection} to turn that matrix 
 \begin{enumerate}
     \item Let's choose two random vectors $u$ and $v$ in $\mathbb{F}^{n}$.
     \item Define the scalar sequence of length $2n$ (we will see why next): $$s_i = u^TA^iv, \quad i \in [0, 2n-1]$$
-    % As we built $\{s_i\}$ by multiplying the powers of $A$ to the right by $v$ and to the left by $u^T$, the minimal polynomial of $A$ will also annihilate the sequence $\{s_i\}$.
-    % Therefore we reduced the $m_i$ search to a scalar sequence.
     \item Using the relation of the minimal polynomial we have:
     $$\sum^d_{i=0} m_i s_{i} = 0$$
     The only unknowns are the $d$ terms $m_i$ but at this time we only have 1 equation, which is not enough. In order to build $d$ equations we shift the identity by multiplying it by any non-negative power $A^k$ because it doesn't alter the identity:
@@ -380,8 +379,7 @@ The idea of Wiedemann is to do a \textbf{scalar projection} to turn that matrix 
 
 \subsection{Berlekamp-Massey algorithm}
 
-The \textbf{Berlekamp-Massey} algorithm, given a finite-length scalar sequence $\{s_0,s_1,\dots,s_{N-1}\}$, computes the shortest linear recurrence (i.e., the minimal polynomial) that generates it:
-% In our context, once we have projected our Krylov-sequence to scalars $s_i=u^TA^iv$, Berlekamp-Massey will produce the monic polynomial:
+The \textbf{Berlekamp-Massey} algorithm \cite{Massey1969}, given a finite-length scalar sequence $\{s_0,s_1,\dots,s_{N-1}\}$, computes the shortest linear recurrence (i.e., the minimal polynomial) that generates it:
 \begin{equation}
     C(x) = 1 + C_1x + C_2x^2 + \dots + C_Lx^L
 \end{equation}
@@ -456,28 +454,87 @@ For very sparse matrices, as in the Quadratic Sieve, it is typical that $d \ll \
 \subsection{Conclusion}
 Wiedemann's algorithm is a powerful method for solving large sparse linear systems over finite fields, particularly in the context of exact linear algebra tasks. By leveraging the properties of the minimal polynomial and the Berlekamp-Massey algorithm, it efficiently reduces the problem to a manageable scalar sequence, allowing for the recovery of solutions with a relatively low computational cost.
 
-\section{Example}
+\pagebreak
 
-Consider the following $7 \times 7$ square sparse matrix $M$ over $\mathbb{F}_2$ that could arise in the Quadratic Sieve context:
+\section{Full example}
+Let's take an example with $N = 2041$.
+As $N$ is small, we can choose $B = 7$, so $\pi(B) = 4$ and the factor base is:
 \begin{equation}
-    M = \begin{pmatrix}
-        0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-        0 & 1 & 0 & 0 & 0 & 1 & 1 \\
-        0 & 0 & 1 & 1 & 1 & 1 & 0 \\
-        0 & 0 & 1 & 1 & 0 & 0 & 0 \\
-        0 & 0 & 1 & 0 & 1 & 1 & 0 \\
-        0 & 1 & 1 & 0 & 1 & 0 & 1 \\
-        0 & 1 & 0 & 0 & 0 & 1 & 1 \\
+    \mathcal{F} = \{2, 3, 5, 7\}
+\end{equation}
+
+
+\subsection{Data collection phase: sieving}
+\begin{equation}
+    \sqrt{N} \approx 45.17, \text{so we start the sieve at 46}
+\end{equation}
+
+\begin{itemize}
+    \item $46^2 \equiv 75 \mod{N}, 75 = 3 \times 5^2,$ 75 is B-smooth
+    \item $47^2 \equiv 168 \mod{N}, 168 = 2^3 \times 3 \times 7,$ 168 is B-smooth
+    \item $48^2 \equiv 263 \mod{N}, 263$ is prime, 263 is not B-smooth
+    \item \dots
+\end{itemize}
+
+At the end of the sieve, we have a set of B-smooth numbers:
+\begin{equation}
+    a_i=\{46, 47, 49, 51, 53\}, \quad
+    x_i=\{75, 168, 360, 560, 768\}
+\end{equation}
+
+\subsection{Data processing phase:}
+
+The exponent matrix $M$ is built, reduced modulo 2 and then transposed.
+
+\begin{equation}
+    M=\begin{pmatrix}
+        0 & 1 & 2 & 0 \\
+        3 & 1 & 0 & 1 \\
+        3 & 2 & 1 & 0 \\
+        4 & 0 & 1 & 1 \\
+        8 & 1 & 0 & 0
+    \end{pmatrix}
+    , \quad M_{mod2}=
+    \begin{pmatrix}
+        0 & 1 & 0 & 0 \\
+        1 & 1 & 0 & 1 \\
+        1 & 0 & 1 & 0 \\
+        0 & 0 & 1 & 1 \\
+        0 & 1 & 0 & 0
+    \end{pmatrix}
+    , \quad M_{mod2}^T=
+    \begin{pmatrix}
+        0 & 1 & 1 & 0 & 0 \\
+        1 & 1 & 0 & 0 & 1 \\
+        0 & 0 & 1 & 1 & 0 \\
+        0 & 1 & 0 & 1 & 0
     \end{pmatrix}
 \end{equation}
 
+\textbf{Kernel search using Wiedemann's algorithm:}
+
+As we will use the Wiedemann algorithm we need a square matrix. Thus we build $M_{mod2}M_{mod2}^T$ which kernel is the same as $M_{mod2}^T$.
+
+\begin{equation}
+    M_{mod2}M_{mod2}^T=
+    \begin{pmatrix}
+        1 & 1 & 0 & 0 & 1 \\
+        1 & 1 & 1 & 1 & 1 \\
+        0 & 1 & 0 & 1 & 0 \\
+        0 & 1 & 1 & 0 & 0 \\
+        1 & 1 & 0 & 0 & 1
+    \end{pmatrix}
+\end{equation}
+
+
 \begin{enumerate}
-    \item First, let's check that the $M$ has a rank smaller than 7. We can see that columns 2 and 7 are equal, so they are linearly dependent. We can also see that the first column is all zeros, which means it does not contribute to the rank. Therefore, the rank of $M$ is at most 5. Hence, this matrix has a non-trivial kernel. We can apply the Wiedemann's algorithm to find a solution to the system $Mx = 0$.
-    \item We choose the random vector $v$ and $u$, for example:
+    \item Check that the matrix is singular:
+
+    Row 1 and row 5 are identical, so its rank is at most 4. Hence $\ker M \neq \{0\}$.
+
+    \item We choose the random vector $u$ and $v$, for example:
     \begin{equation}
-        v = \begin{pmatrix}
-            0 \\
-            0 \\
+        u = \begin{pmatrix}
             1 \\
             1 \\
             1 \\
@@ -485,47 +542,43 @@ Consider the following $7 \times 7$ square sparse matrix $M$ over $\mathbb{F}_2$
             1 \\
         \end{pmatrix}
         \quad \text{and} \quad
-        u = \begin{pmatrix}
-            0 \\
-            0 \\
+        v = \begin{pmatrix}
             0 \\
             1 \\
+            0 \\
             1 \\
-            0 \\
-            0 \\
+            1
         \end{pmatrix}
     \end{equation}
     We check that $s_0=u^Tv \equiv 0 \mod 2$:
     \begin{equation}
-        s_0 = u^Tv = 0 \cdot 0 + 0 \cdot 0 + 0 \cdot 1 + 1 \cdot 1 + 1 \cdot 1 + 0 \cdot 0 + 0 \cdot 1 = 2 \equiv 0 \mod 2
+        s_0 = u^Tv = 1 \cdot 0 + 1 \cdot 1 + 1 \cdot 0 + 0 \cdot 1 + 1 \cdot 1 = 2 \equiv 0 \mod 2
     \end{equation}
 
-    \item We compute the scalar sequence $s_i = u^T M^i v$ for $i=0,1,\dots,13$:
+    \item We compute the scalar sequence $s_i = u^T M^i v$ for $i=0,1,\dots,9$:
     \begin{equation}
-        \{s_0, s_1, s_2, s_3, s_4, s_5, s_6, s_7, s_8, s_9, s_{10}, s_{11}, s_{12}, s_{13} \} 
+        \{s_0, s_1, s_2, s_3, s_4, s_5, s_6, s_7, s_8, s_9\} 
         = 
-        \left\{0,0,1,0,1,0,0,1,0,1,0,0,1,0\right\}
+        \left\{0,1,0,0,1,1,0,0,1,1\right\}
     \end{equation}
     \item We apply the Berlekamp-Massey algorithm to the scalar sequence $\{s_i\}$ to find the minimal polynomial coefficients $m_i$:
     \begin{equation}
-        m_i = \{1, 1, 1, 1, 1, 0\}
+        m_i = \{1, 1, 1, 1, 0\}
     \end{equation}
     \item The minimal polynomial is then:
     \begin{equation}
-        m_M(x) = 1 + x + x^2 + x^3 + x^4
+        m_M(x) = 1 + x + x^2 + x^3
     \end{equation}
     \item We can now compute the solution $x$ using the minimal polynomial:
     \begin{equation}
-        x = -(M^4 v + M^3 v + M^2 v + M v) \mod 2
-        = \begin{pmatrix}
-            0 \\
+        x = (M^3 + M^2 + M + I)v
+        \equiv \begin{pmatrix}
             1 \\
-            0 \\
-            0 \\
+            1 \\
             1 \\
             1 \\
             0 \\
-        \end{pmatrix}
+        \end{pmatrix} \mod 2
     \end{equation}
     \item Finally, we can verify that $Mx = 0$:
     \begin{equation}
@@ -534,71 +587,32 @@ Consider the following $7 \times 7$ square sparse matrix $M$ over $\mathbb{F}_2$
     This confirms that the Wiedemann's algorithm has successfully found a solution to the system $Mx = 0$.
 \end{enumerate}
 
-\newpage
+\textbf{Tentative solution computation:}
 
-\section{Parallelize sieving}
-Here is the pseudocode of serial style seiving:
+The solution vector $x$ corresponds to the couples: $\{46,75\}, \{47,168\}, \{49,360\}, \{51,560\}$.
 
-\begin{verbatim}
-    Function Q_B_friables_128(N, A, factor_base):
-    # Compute starting offset: sqrt(N) + 1
-    range_start ← integer_sqrt(N) + 1
-
-    # Initialize arrays
-    Q  ← new array of length A         # holds Q(x) = (x + range_start)^2 - N
-    Qf ← empty list                    # will hold the "fully factored" values
-    X  ← empty list                    # will hold the corresponding x-values
-
-    # 1. Fill the Q array
-    For i from 0 to A-1 do
-        x ← range_start + i
-        Q[i] ← x * x - N
-
-    # 2. For each prime in the factor base, strip out its powers
-    For each p in factor_base do
-        a1 ← -1
-        a2 ← -1
-
-        # Find the two first indices where Q[j] = 0 mod p
-        For j from 0 to A-1 do
-            If Q[j] mod p = 0 then
-                If a1 = -1 then
-                    a1 ← j
-                Else
-                    a2 ← j
-                    Break out of the j-loop
-        # Compute the gap between the two roots
-        gap ← a2 - a1
-
-        # Walk through the interval in steps of p, dividing out all p-factors
-        For k from a1 to (A-1 - gap) step p do
-            # Remove p-factors at position k
-            While Q[k] > 1 and Q[k] mod p = 0 do
-                Q[k] ← Q[k] / p
-            # Remove p-factors at position k + gap
-            While Q[k + gap] > 1 and Q[k + gap] mod p = 0 do
-                Q[k + gap] ← Q[k + gap] / p
-
-    # 3. Collect the "friable" values (where Q[i] has been reduced to 1)
-    For i from 0 to A-1 do
-        If Q[i] = 1 then
-            x ← range_start + i
-            original_Q ← x * x - N
-            Append original_Q to Qf
-            Append x to X
-
-    # Return the list of friable values and their corresponding x's
-    Return (Qf, X)
-
-\end{verbatim}
-
-We can see some parallelizable tasks:
-\begin{itemize}
-    \item Q filling: completely independent writes, the filling can be parallel
-    \item Q[k] dividing
-    \item Qf and X filling if we init them first
-\end{itemize}
-
+Thus we can compute the tentative solution:
+\begin{equation}
+    (46 \times 47 \times 49 \times 51)^2 \equiv 75 \times 168 \times 360 \times 560 \mod{N} \\
+\end{equation}
+\begin{equation}
+    (46 \times 47 \times 49 \times 51)^2  \equiv 2^{10} \times 3^{4} \times 5^4 \times 7^2 \mod{N} \\
+\end{equation}
+\begin{equation}
+    (46 \times 47 \times 49 \times 51)^2  \equiv (2^5 \times 3^2 \times 5^2 \times 7)^2 \mod{N} \rightarrow \text{We found a square modulo N}
+\end{equation}
+Now,
+\begin{equation}
+    a = 5402838 \equiv 311 \mod N, \quad b = 50400 \equiv 1416 \mod N
+\end{equation}
+\begin{equation}
+    pgcd(1416 - 311, N) = 13 \ \text{and} \ pgcd(311 + 1416, N) = 157
+\end{equation}
+\\
+We found the two prime factors of $N$:
+\begin{equation}
+    2041 = 157 \times 13
+\end{equation}
 
 \newpage
 
@@ -641,6 +655,8 @@ function BerlekampMassey(s):
                 m = i + 1 - L
     return C  # returns the coefficients of the minimal polynomial
 \end{verbatim}
+
+\pagebreak
 
 \bibliographystyle{plain}
 \bibliography{biblio}
