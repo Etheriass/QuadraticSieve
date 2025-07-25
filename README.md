@@ -104,6 +104,7 @@ Processing phase         0.1660  1.5370  %
 Total                    10.7996 
 ```
 
+*Ran on a laptop with 16GB RAM and an Intel i7 1260p (12 cores, 16 threads)*
 
 ## Testing
 
